@@ -1,10 +1,13 @@
 <?php
 
+use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\AuthenticationController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AuthenticationController::class, 'showLoginForm']);
-Route::post('/login', [AuthenticationController::class, 'authenticate'])->name('login');
+Route::get('/', [AuthenticationController::class, 'showLoginForm'])
+    ->middleware('guest');
+Route::post('/login', [AuthenticationController::class, 'authenticate'])
+    ->middleware('guest')->name('login');
 
 
 Route::middleware('auth')->group(function () {
@@ -12,4 +15,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('layouts.app');
     })->name('dashboard');
+});
+
+
+
+Route::group(['prefix' => 'master', 'as' => 'master.', 'middleware' => 'auth'], function () {
+    Route::get('pengguna', [UserController::class, 'index'])->name('pengguna.index');
 });

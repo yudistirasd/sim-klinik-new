@@ -8,6 +8,15 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../satusehat-api",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
         "php": "^8.2",
         "laravel-lang/common": "^6.7",
@@ -15,7 +24,9 @@
         "laravel/telescope": "^5.14",
         "laravel/tinker": "^2.10.1",
         "laravolt/avatar": "^6.3",
-        "tightenco/ziggy": "^2.6"
+        "tightenco/ziggy": "^2.6",
+        "yajra/laravel-datatables-oracle": "12.0",
+        "yudistirasd/satusehat-api": "dev-main"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6",
@@ -33,7 +44,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -90,6 +104,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }

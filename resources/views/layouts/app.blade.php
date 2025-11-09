@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard - {{ config('app.name') }}</title>
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
     <link href="{{ asset('css/tabler.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
     <link href="{{ asset('css/app.css') }}?{{ config('app.version') }}" rel="stylesheet" />
     <link href="{{ asset('css/tabler-icons.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
+    <link href="{{ asset('css/inter.css') }}?{{ config('app.version') }}" rel="stylesheet" />
+    <link href="{{ asset('libs/sweetalert2/sweetalert2.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- END GLOBAL MANDATORY STYLES -->
-    <!-- BEGIN CUSTOM FONT -->
-    <style>
-      @import url("https://rsms.me/inter/inter.css");
-    </style>
-    <!-- END CUSTOM FONT -->
+    @stack('css')
   </head>
 
   <body class="layout-fluid">
@@ -34,12 +34,14 @@
             <div class="row g-2 align-items-center">
               <div class="col">
                 <!-- Page pre-title -->
-                <h2 class="page-title">@yield('title')</h2>
                 <div class="page-pretitle">@yield('subtitle')</div>
+                <h2 class="page-title">@yield('title')</h2>
               </div>
               <!-- Page title actions -->
               <div class="col-auto ms-auto d-print-none">
-                @yield('action-page')
+                <div class="btn-list">
+                  @yield('action-page')
+                </div>
               </div>
             </div>
           </div>
@@ -91,10 +93,77 @@
         <!--  END FOOTER  -->
       </div>
     </div>
+    @routes()
     <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
     <script src="{{ asset('js/tabler-theme.min.js') }}?{{ config('app.version') }}" defer></script>
     <script src="{{ asset('js/tabler.min.js') }}?{{ config('app.version') }}" defer></script>
+    <script src="{{ asset('libs/jquery/jquery-3.7.0.min.js') }}?{{ config('app.version') }}"></script>
+    <script src="{{ asset('libs/sweetalert2/sweetalert2.all.min.js') }}?{{ config('app.version') }}"></script>
     <!-- END GLOBAL MANDATORY SCRIPTS -->
+    <script>
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      });
+
+      const confirmDelete = (endpoint, callback) => {
+        Swal.fire({
+          title: "Apakah anda yakin akan menghapus data ini?",
+          html: "anda tidak dapat mengembalikan data yang sudah dihapus!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Ya, hapus!",
+          cancelButtonText: "Tidak, batalkan",
+          showLoaderOnConfirm: true,
+          preConfirm: async (login) => {
+            return $.ajax({
+              url: endpoint,
+              method: 'DELETE',
+              headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+            }).done((response) => {
+              Toast.fire({
+                icon: 'success',
+                title: response.message
+              });
+
+              if (typeof callback == 'function') {
+                callback()
+              } else {
+                console.error(`Ajax ${endpoint}, callback is not a function !`);
+              }
+            }).fail((error) => {
+              let response = error.responseJSON;
+
+              Swal.fire({
+                icon: 'error',
+                title: 'Terjadi kesalahan !',
+                message: response.message
+              })
+            })
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+        }).then(async (result) => {
+          if (!result.value) {
+            Swal.fire({
+              icon: 'info',
+              title: 'Aksi dibatalkan !',
+            })
+          }
+        });
+      }
+    </script>
+    @stack('js')
   </body>
 
 </html>
