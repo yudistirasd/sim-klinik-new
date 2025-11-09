@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Master;
 
 use DB;
+use Str;
 use DataTables;
 use App\Http\Controllers\Controller;
 use App\Models\Departemen;
 use App\Http\Requests\StoreDepartemenRequest;
 use App\Http\Requests\UpdateDepartemenRequest;
 use Satusehat\Integration\FHIR\Organization;
-use Str;
 
 class DepartemenController extends Controller
 {
@@ -21,9 +21,7 @@ class DepartemenController extends Controller
         return DataTables::of($departemen)
             ->addIndexColumn()
             ->addColumn('action', function ($row) {
-
-                if ($row->username != 'admin') {
-                    return "
+                return "
                                 <button class='btn btn-warning btn-icon' onclick='handleModal(`edit`, `Ubah Departemen`, " . json_encode($row) . ")'>
                                     <i class='ti ti-edit'></i>
                                 </button>
@@ -31,7 +29,6 @@ class DepartemenController extends Controller
                                     <i class='ti ti-trash'></i>
                                 </button>
                             ";
-                }
             })
             ->rawColumns([
                 'action',
