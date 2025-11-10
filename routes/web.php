@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\Master\DepartemenController;
 use App\Http\Controllers\Master\ProdukController;
 use App\Http\Controllers\Master\RuanganController;
+use App\Http\Controllers\Master\PasienController;
+use App\Http\Controllers\Registrasi\RegistrasiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthenticationController::class, 'showLoginForm'])
@@ -27,4 +29,13 @@ Route::group(['prefix' => 'master', 'as' => 'master.', 'middleware' => 'auth'], 
     Route::get('departemen', [DepartemenController::class, 'index'])->name('departemen.index');
     Route::get('ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
     Route::get('produk/{jenis}', [ProdukController::class, 'index'])->name('produk.index');
+
+    Route::get('pasien', [PasienController::class, 'index'])->name('pasien.index');
+    Route::get('pasien/create', [PasienController::class, 'create'])->name('pasien.create');
+    Route::get('pasien/edit/{pasien}', [PasienController::class, 'edit'])->name('pasien.edit');
+});
+
+
+Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.', 'middleware' => 'auth'], function () {
+    Route::get('{pasien}', [RegistrasiController::class, 'create'])->name('create');
 });
