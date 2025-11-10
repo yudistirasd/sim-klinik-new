@@ -10,7 +10,7 @@
 @endpush
 
 @section('action-page')
-  <a href="{{ route('master.pasien.create') }}" class="btn btn-primary btn-5">
+  <a href="{{ route('registrasi.pasien.create') }}" class="btn btn-primary btn-5">
     <div class="ti ti-plus me-1"></div>
     Pasien Baru
   </a>
@@ -27,11 +27,11 @@
               <th class="text-center">#</th>
               <th class="text-center">NIK</th>
               <th class="text-center">No RM</th>
-              <th class="text-center" style="width: 20%">Nama</th>
+              <th class="text-center" style="width: 10%">Nama</th>
               <th class="text-center">Jenis Kelamin</th>
               <th class="text-center">Tempat & Tgl Lahir</th>
               <th class="text-center">Usia</th>
-              <th class="text-center" style="width: 20%">Alamat</th>
+              <th class="text-center">Alamat</th>
               <th class="text-center">Aksi</th>
             </tr>
             <tr class="filter-row">
@@ -66,7 +66,7 @@
       serverSide: true,
       autoWidth: false,
       destroy: true,
-      ajax: route('api.master.pasien.dt'),
+      ajax: route('api.registrasi.pasien.dt'),
       orderCellsTop: true,
       initComplete: function() {
         this.api()
@@ -126,7 +126,7 @@
           data: 'action',
           name: 'action',
           sClass: 'text-center',
-          width: "10%"
+          width: "15%"
         },
       ]
     });
@@ -149,7 +149,7 @@
 
           if (action == 'create') {
             delete this.form._method;
-            this.endPoint = route('api.master.pasien.store')
+            this.endPoint = route('api.registrasi.pasien.store')
           }
 
           if (action == 'edit') {
@@ -158,7 +158,7 @@
               _method: 'PUT'
             };
 
-            this.endPoint = route('api.master.pasien.update', data.id);
+            this.endPoint = route('api.registrasi.pasien.update', data.id);
           }
 
           $('#modal-pasien').modal('show');

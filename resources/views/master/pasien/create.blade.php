@@ -9,7 +9,7 @@
 @endpush
 
 @section('action-page')
-  <a href="{{ route('master.pasien.index') }}" class="btn btn-icon btn-dark btn-5">
+  <a href="{{ route('registrasi.pasien.index') }}" class="btn btn-icon btn-dark btn-5">
     <div class="ti ti-arrow-left me-1"></div>
   </a>
 @endsection
@@ -181,7 +181,7 @@
           this.errors = {};
 
           $.ajax({
-            url: route('api.master.pasien.store'),
+            url: route('api.registrasi.pasien.store'),
             method: 'POST',
             data: this.form,
             dataType: 'json',
@@ -206,7 +206,7 @@
               if (result.isConfirmed) {
                 window.location.href = route('registrasi.create', response.data.id)
               } else {
-                window.location.href = route('master.pasien.index');
+                window.location.href = route('registrasi.pasien.index');
               }
             });
           }).fail((error) => {

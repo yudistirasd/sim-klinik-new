@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\Registrasi;
 
 use DataTables;
 use App\Http\Controllers\Controller;
@@ -52,10 +52,13 @@ class PasienController extends Controller
             })
             ->addColumn('action', function ($row) {
                 return "
-                                <a class='btn btn-warning btn-icon' href='" . route('master.pasien.edit', $row->id) . "'>
+                                <a class='btn btn-primary btn-icon' href='" . route('registrasi.create', $row->id) . "'>
+                                    <i class='ti ti-calendar-user'></i>
+                                </a>
+                                <a class='btn btn-warning btn-icon' href='" . route('registrasi.pasien.edit', $row->id) . "'>
                                     <i class='ti ti-edit'></i>
                                 </a>
-                                <button class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.master.pasien.destroy', $row->id) . "`, table.ajax.reload)'>
+                                <button class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.registrasi.pasien.destroy', $row->id) . "`, table.ajax.reload)'>
                                     <i class='ti ti-trash'></i>
                                 </button>
                             ";
@@ -70,7 +73,7 @@ class PasienController extends Controller
      */
     public function index()
     {
-        return view('master.pasien.index');
+        return view('registrasi.pasien.index');
     }
 
     /**
@@ -81,7 +84,7 @@ class PasienController extends Controller
         $agama = Agama::all();
         $pekerjaan = Pekerjaan::all();
 
-        return view('master.pasien.create', compact([
+        return view('registrasi.pasien.create', compact([
             'agama',
             'pekerjaan'
         ]));
@@ -119,7 +122,7 @@ class PasienController extends Controller
             'pekerjaan'
         ]);
 
-        return view('master.pasien.edit', compact([
+        return view('registrasi.pasien.edit', compact([
             'agama',
             'pekerjaan',
             'pasien'

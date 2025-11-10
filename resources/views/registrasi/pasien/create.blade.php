@@ -9,7 +9,7 @@
 @endpush
 
 @section('action-page')
-  <a href="{{ route('master.pasien.index') }}" class="btn btn-icon btn-dark btn-5">
+  <a href="{{ route('registrasi.pasien.index') }}" class="btn btn-icon btn-dark btn-5">
     <div class="ti ti-arrow-left me-1"></div>
   </a>
 @endsection
@@ -34,8 +34,8 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Nama</label>
-              <input type="text" class="form-control" x-model="form.name" :class="{ 'is-invalid': errors.name }">
-              <div class="invalid-feedback" x-text="errors.name"></div>
+              <input type="text" class="form-control" x-model="form.nama" :class="{ 'is-invalid': errors.nama }">
+              <div class="invalid-feedback" x-text="errors.nama"></div>
 
             </div>
             <div class="row mb-3">
@@ -158,7 +158,7 @@
       Alpine.data('form', () => ({
         form: {
           id: null,
-          name: '',
+          nama: '',
           nik: '',
           tempat_lahir: '',
           tanggal_lahir: '',
@@ -181,7 +181,7 @@
           this.errors = {};
 
           $.ajax({
-            url: route('api.master.pasien.store'),
+            url: route('api.registrasi.pasien.store'),
             method: 'POST',
             data: this.form,
             dataType: 'json',
@@ -192,18 +192,21 @@
               this.loading = false;
             }
           }).done((response) => {
-            // this.resetForm();
+            this.resetForm();
             Swal.fire({
               icon: 'success',
               title: 'Sukses !',
               text: response.message,
               showCancelButton: true,
               confirmButtonColor: "#3085d6",
-              cancelButtonColor: "#d33",
-              confirmButtonText: "Lanjut registrasi"
+              cancelButtonColor: "#202020",
+              confirmButtonText: "Lanjut registrasi",
+              cancelButtonText: "Kembali"
             }).then((result) => {
               if (result.isConfirmed) {
-                window.location.href = route('registrasi.create', )
+                window.location.href = route('registrasi.create', response.data.id)
+              } else {
+                window.location.href = route('registrasi.pasien.index');
               }
             });
           }).fail((error) => {
@@ -391,7 +394,7 @@
 
         resetForm() {
           this.form = {
-            name: '',
+            nama: '',
             nik: '',
             tempat_lahir: '',
             tanggal_lahir: '',
