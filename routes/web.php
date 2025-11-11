@@ -39,4 +39,5 @@ Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.', 'middleware' => '
 
     Route::get('kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.index');
     Route::get('kunjungan/{pasien}', [KunjunganController::class, 'create'])->name('kunjungan.create');
+    Route::get('kunjungan/edit/{kunjungan}', [KunjunganController::class, 'edit'])->name('kunjungan.edit');
 });

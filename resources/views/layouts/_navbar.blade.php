@@ -58,7 +58,7 @@
           <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/package -->
             <i class="ti ti-calendar-user"></i>
           </span>
-          <span class="nav-link-title"> Registrasi Pasien </span>
+          <span class="nav-link-title"> Registrasi </span>
         </a>
         <div class="dropdown-menu">
           <div class="dropdown-menu-columns">

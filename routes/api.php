@@ -47,6 +47,7 @@ Route::group(['as' => 'api.'], function () {
 
     Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.'], function () {
         Route::get('pasien/dt', [PasienController::class, 'dt'])->name('pasien.dt');
+        Route::get('kunjungan/dt', [KunjunganController::class, 'dt'])->name('kunjungan.dt');
 
 
         Route::apiResources([

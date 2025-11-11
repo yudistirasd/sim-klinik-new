@@ -4,19 +4,56 @@ namespace App\Http\Controllers\Registrasi;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreKunjunganRequest;
+use App\Http\Requests\UpdateKunjunganRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\Kunjungan;
 use App\Models\Pasien;
 use App\Models\Ruangan;
 use App\Models\User;
 use Auth;
+use DataTables;
 use Illuminate\Http\Request;
 
 class KunjunganController extends Controller
 {
+    public function dt()
+    {
+        $data = Kunjungan::query()
+            ->with([
+                'pasien',
+                'pasien.provinsi',
+                'pasien.kabupaten',
+                'pasien.kecamatan',
+                'pasien.kelurahan',
+                'ruangan',
+                'dokter',
+            ]);
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->editColumn('alamat', function ($row) {
+                return "{$row->pasien->alamat}, {$row->pasien->kelurahan->name}, {$row->pasien->kecamatan->name}, {$row->pasien->kabupaten->name}, {$row->pasien->provinsi->name}";
+            })
+            ->addColumn('action', function ($row) {
+                return "
+                                <a class='btn btn-warning btn-icon' href='" . route('registrasi.kunjungan.edit', $row->id) . "'>
+                                    <i class='ti ti-edit'></i>
+                                </a>
+                                <button class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.registrasi.kunjungan.destroy', $row->id) . "`, table.ajax.reload)'>
+                                    <i class='ti ti-trash'></i>
+                                </button>
+                            ";
+            })
+            ->rawColumns([
+                'action',
+            ])
+            ->make(true);
+    }
     public function index()
     {
-        return 'index';
+        return view('registrasi.kunjungan.index');
     }
+
     public function create(Pasien $pasien)
     {
         $dokter = User::dokter()->get();
@@ -38,5 +75,41 @@ class KunjunganController extends Controller
         Kunjungan::create($request->except(['id']));
 
         return $this->sendResponse(message: 'Registrasi kunjungan pasien berhasil');
+    }
+
+    public function edit(Kunjungan $kunjungan)
+    {
+        $kunjungan->load(['pasien', 'jenisPenyakit']);
+
+        $dokter = User::dokter()->get();
+        $ruangan = Ruangan::all();
+        $jenis_pembayaran = jenisPembayaran();
+        $jenis_layanan = jenisLayanan();
+
+        $pasien = $kunjungan->pasien;
+
+        return view('registrasi.kunjungan.edit', compact([
+            'pasien',
+            'dokter',
+            'jenis_pembayaran',
+            'jenis_layanan',
+            'ruangan',
+            'kunjungan'
+        ]));
+    }
+
+    public function update(UpdateKunjunganRequest $request, Kunjungan $kunjungan)
+    {
+        Kunjungan::find($kunjungan->id)
+            ->update($request->except(['id', '_method']));
+
+        return $this->sendResponse(message: 'Registrasi kunjungan pasien berhasil diubah');
+    }
+
+    public function destroy(Kunjungan $kunjungan)
+    {
+        $kunjungan->delete();
+
+        return $this->sendResponse(message: 'Registrasi kunjungan pasien berhasil dihapus');
     }
 }

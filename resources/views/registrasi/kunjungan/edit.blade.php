@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Kunjungan Pasien')
-@section('subtitle', 'Registrasi')
+@section('subtitle', 'Ubah')
 
 @push('css')
   <link href="{{ asset('libs/select2/select2.css') }}" rel="stylesheet" />
@@ -232,6 +232,7 @@
   <script src="{{ asset('libs/datatables/responsive.bootstrap5.js') }}?{{ config('app.version') }}"></script>
   <script>
     let pasien = {!! json_encode($pasien) !!};
+    let kunjungan = {!! json_encode($kunjungan) !!}
 
     const table = new DataTable('#diagnosa-table', {
       processing: true,
@@ -278,12 +279,13 @@
           id: null,
           pasien_id: pasien.id,
           icd10_id: '',
-          tanggal_registrasi: '{{ date('Y-m-d h:i') }}',
-          jenis_pembayaran: 'UMUM',
-          jenis_layanan: 'RJ',
+          tanggal_registrasi: '',
+          jenis_pembayaran: '',
+          jenis_layanan: '',
           dokter_id: '',
           ruangan_id: '',
-          created_by: '{{ Auth::id() }}'
+          created_by: '',
+          _method: 'PUT'
 
         },
         endPoint: '',
@@ -295,7 +297,7 @@
           this.errors = {};
 
           $.ajax({
-            url: route('api.registrasi.kunjungan.store'),
+            url: route('api.registrasi.kunjungan.update', kunjungan.id),
             method: 'POST',
             data: this.form,
             dataType: 'json',
@@ -397,6 +399,17 @@
               e.detail.date.format('yyyy-MM-dd HH:mm') :
               '';
           });
+
+          this.id = kunjungan.id;
+          this.form.icd10_id = kunjungan.icd10_id;
+          this.form.tanggal_registrasi = kunjungan.tanggal_registrasi;
+          this.form.jenis_pembayaran = kunjungan.jenis_pembayaran;
+          this.form.jenis_layanan = kunjungan.jenis_layanan;
+          this.form.dokter_id = kunjungan.dokter_id;
+          this.form.ruangan_id = kunjungan.ruangan_id;
+          this.form.created_by = kunjungan.created_by;
+          this.icd10_selected = `${kunjungan.jenis_penyakit.code} - ${kunjungan.jenis_penyakit.display_en}`;
+
         },
 
 
