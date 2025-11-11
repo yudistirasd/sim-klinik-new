@@ -30,6 +30,7 @@ Route::group(['as' => 'api.'], function () {
         Route::get('wilayah/kelurahan', [WilayahController::class, 'kelurahan'])->name('wilayah.kelurahan');
 
         Route::get('icd10/dt', [ICDController::class, 'icd10dt'])->name('icd10.dt');
+        Route::get('icd9/dt', [ICDController::class, 'icd9dt'])->name('icd9.dt');
 
 
         Route::apiResources([
@@ -63,7 +64,16 @@ Route::group(['as' => 'api.'], function () {
     });
 
     Route::group(['prefix' => 'pemeriksaan', 'as' => 'pemeriksaan.'], function () {
+
         Route::post('asesmen-keperawatan', [PemeriksaanController::class, 'storeAsesmenKeperawatan'])->name('store.asesmen-keperawatan');
         Route::post('asesmen-medis', [PemeriksaanController::class, 'storeAsesmenMedis'])->name('store.asesmen-medis');
+
+        Route::get('diagnosa-pasien', [PemeriksaanController::class, 'dtDiagnosa'])->name('get.diagnosa-pasien');
+        Route::post('diagnosa-pasien', [PemeriksaanController::class, 'storeDiagnosaPasien'])->name('store.diagnosa-pasien');
+        Route::delete('diagnosa-pasien/{diagnosa}', [PemeriksaanController::class, 'destroyDiagnosaPasien'])->name('destroy.diagnosa-pasien');
+
+        Route::get('prosedure-pasien', [PemeriksaanController::class, 'dtProsedure'])->name('get.prosedure-pasien');
+        Route::post('prosedure-pasien', [PemeriksaanController::class, 'storeProsedurePasien'])->name('store.prosedure-pasien');
+        Route::delete('prosedure-pasien/{prosedure}', [PemeriksaanController::class, 'destroyProsedurePasien'])->name('destroy.prosedure-pasien');
     });
 });

@@ -130,9 +130,32 @@
     <div class="card mt-3">
       <div class="card-header bg-primary text-white">
         <h3 class="card-title">Diagnosa (ICD 10)</h3>
+        <div class="card-actions">
+        </div>
       </div>
       <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-12">
+            <a href="javascript:;" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modal-icd10">
+              <div class="ti ti-search"></div> Cari Diagnosa
+            </a>
+          </div>
+        </div>
 
+        <div class="table-responsive col-sm-12">
+          <table id="diagnosa-pasien-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm" style="width: 100%;">
+            <thead>
+              <tr>
+                <th class="text-center">No.</th>
+                <th class="text-center">Kode</th>
+                <th class="text-center">Nama ICD</th>
+                <th class="text-center">Nama Indonesia</th>
+                <th class="text-center">Act</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -141,6 +164,28 @@
         <h3 class="card-title">Procedure (ICD 9)</h3>
       </div>
       <div class="card-body">
+        <div class="row mb-3">
+          <div class="col-12">
+            <a href="javascript:;" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modal-icd9">
+              <div class="ti ti-search"></div> Cari Prosedure
+            </a>
+          </div>
+        </div>
+
+        <div class="table-responsive col-sm-12">
+          <table id="prosedure-pasien-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm" style="width: 100%;">
+            <thead>
+              <tr>
+                <th class="text-center">No.</th>
+                <th class="text-center">Kode</th>
+                <th class="text-center">Nama ICD</th>
+                <th class="text-center">Nama Indonesia</th>
+                <th class="text-center">Act</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="card-footer text-end">
@@ -154,8 +199,202 @@
   </form>
 </div>
 
+<div class="modal modal-blur fade" id="modal-icd10" tabindex="-1" data-bs-keyboard="false" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" x-text="title">Pencarian ICD 10 </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive col-sm-12">
+          <table id="diagnosa-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm" style="width: 100%;">
+            <thead>
+              <tr>
+                <th class="text-center">No.</th>
+                <th class="text-center">Kode</th>
+                <th class="text-center">Nama ICD</th>
+                <th class="text-center">Nama Indonesia</th>
+                <th class="text-center">Act</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal modal-blur fade" id="modal-icd9" tabindex="-1" data-bs-keyboard="false" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" x-text="title">Pencarian ICD 9 </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive col-sm-12">
+          <table id="prosedure-table" class="table table-bordered table-striped table-sm" style="width: 100%;">
+            <thead>
+              <tr>
+                <th class="text-center">No.</th>
+                <th class="text-center">Kode</th>
+                <th class="text-center">Nama ICD</th>
+                <th class="text-center">Nama Indonesia</th>
+                <th class="text-center">Act</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 @push('pemeriksaan-js')
   <script>
+    const tableDiagnosa = new DataTable('#diagnosa-table', {
+      processing: true,
+      serverSide: true,
+      autoWidth: false,
+      destroy: true,
+      ajax: route('api.master.icd10.dt'),
+      order: [
+        [
+          1, 'asc'
+        ]
+      ],
+      columns: [{
+          data: 'DT_RowIndex',
+          name: 'DT_RowIndex',
+          orderable: false,
+          searchable: false,
+          sClass: 'text-center',
+          width: '5%'
+        },
+        {
+          "data": "code"
+        },
+        {
+          "data": "display_en"
+        },
+        {
+          "data": "display_id"
+        },
+        {
+          data: 'action',
+          name: 'action',
+          sClass: 'text-center',
+          width: "10%"
+        },
+      ]
+    });
+
+    const tableProsedure = new DataTable('#prosedure-table', {
+      processing: true,
+      serverSide: true,
+      autoWidth: false,
+      destroy: true,
+      ajax: route('api.master.icd9.dt'),
+      order: [
+        [
+          1, 'asc'
+        ]
+      ],
+      columns: [{
+          data: 'DT_RowIndex',
+          name: 'DT_RowIndex',
+          orderable: false,
+          searchable: false,
+          sClass: 'text-center',
+          width: '5%'
+        },
+        {
+          "data": "code"
+        },
+        {
+          "data": "display_en"
+        },
+        {
+          "data": "display_id"
+        },
+        {
+          data: 'action',
+          name: 'action',
+          sClass: 'text-center',
+          width: "10%"
+        },
+      ]
+    });
+
+    const diagnosaPasienTable = new DataTable('#diagnosa-pasien-table', {
+      dom: 'Brti',
+      processing: true,
+      serverSide: true,
+      autoWidth: false,
+      destroy: true,
+      ajax: route('api.pemeriksaan.get.diagnosa-pasien'),
+      columns: [{
+          data: 'DT_RowIndex',
+          name: 'DT_RowIndex',
+          orderable: false,
+          searchable: false,
+          sClass: 'text-center',
+          width: '5%'
+        },
+        {
+          "data": "code"
+        },
+        {
+          "data": "display_en"
+        },
+        {
+          "data": "display_id"
+        },
+        {
+          data: 'action',
+          name: 'action',
+          sClass: 'text-center',
+          width: "10%"
+        },
+      ]
+    });
+
+    const prosedurePasienTable = new DataTable('#prosedure-pasien-table', {
+      dom: 'Brti',
+      processing: true,
+      serverSide: true,
+      autoWidth: false,
+      destroy: true,
+      ajax: route('api.pemeriksaan.get.prosedure-pasien'),
+      columns: [{
+          data: 'DT_RowIndex',
+          name: 'DT_RowIndex',
+          orderable: false,
+          searchable: false,
+          sClass: 'text-center',
+          width: '5%'
+        },
+        {
+          "data": "code"
+        },
+        {
+          "data": "display_en"
+        },
+        {
+          "data": "display_id"
+        },
+        {
+          data: 'action',
+          name: 'action',
+          sClass: 'text-center',
+          width: "10%"
+        },
+      ]
+    });
+
+
     document.addEventListener('alpine:init', () => {
       Alpine.data('AsesmenMedis', () => ({
         form: {
@@ -239,8 +478,120 @@
           this.form.indikasi_medis = asesmenMedis.indikasi_medis;
           this.form.tindak_lanjut = asesmenMedis.tindak_lanjut;
           this.form.tindak_lanjut_ket = asesmenMedis.tindak_lanjut_ket;
-        }
+        },
+
+        selectIcd10(row) {
+          let button = $(`#diagnosa-${row.id}`);
+          let originalButtonElement = button.html();
+
+          button.html(`<span class="spinner-border spinner-border-sm"></span>`)
+          button.prop('disabled', true);
+
+          $.ajax({
+            url: route('api.pemeriksaan.store.diagnosa-pasien'),
+            method: 'POST',
+            data: {
+              pasien_id: pasien.id,
+              kunjungan_id: kunjungan.id,
+              icd10_id: row.id
+            },
+            dataType: 'json',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            complete: () => {
+              button.prop('disabled', false);
+              button.html(originalButtonElement);
+            }
+          }).done((response) => {
+            Toast.fire({
+              icon: 'success',
+              title: response.message
+            });
+
+          }).fail((error) => {
+            if (error.status === 422) {
+              this.errors = error.responseJSON.errors;
+
+              Toast.fire({
+                icon: 'error',
+                title: error.responseJSON.message
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan !',
+                text: error.responseJSON.message
+              });
+            }
+          })
+        },
+
+        selectIcd9(row) {
+          let button = $(`#prosedure-${row.id}`);
+          let originalButtonElement = button.html();
+
+          button.html(`<span class="spinner-border spinner-border-sm"></span>`)
+          button.prop('disabled', true);
+
+          $.ajax({
+            url: route('api.pemeriksaan.store.prosedure-pasien'),
+            method: 'POST',
+            data: {
+              pasien_id: pasien.id,
+              kunjungan_id: kunjungan.id,
+              icd9_id: row.id
+            },
+            dataType: 'json',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            complete: () => {
+              button.prop('disabled', false);
+              button.html(originalButtonElement);
+            }
+          }).done((response) => {
+            Toast.fire({
+              icon: 'success',
+              title: response.message
+            });
+
+          }).fail((error) => {
+            if (error.status === 422) {
+              this.errors = error.responseJSON.errors;
+
+              Toast.fire({
+                icon: 'error',
+                title: error.responseJSON.message
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan !',
+                text: error.responseJSON.message
+              });
+            }
+          })
+        },
       }))
+    })
+
+    const selectIcd10 = (row) => {
+      const alpineComponent = Alpine.$data(document.querySelector('[x-data="AsesmenMedis"]'));
+      alpineComponent.selectIcd10(row);
+    }
+
+    const selectIcd9 = (row) => {
+      const alpineComponent = Alpine.$data(document.querySelector('[x-data="AsesmenMedis"]'));
+      alpineComponent.selectIcd9(row);
+    }
+
+    $('#modal-icd10').on('hidden.bs.modal', () => {
+      diagnosaPasienTable.ajax.reload()
+    })
+
+    $('#modal-icd9').on('hidden.bs.modal', () => {
+      prosedurePasienTable.ajax.reload()
     })
   </script>
 @endpush

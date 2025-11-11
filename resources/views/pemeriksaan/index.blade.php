@@ -167,33 +167,6 @@
       </div>
     </div>
   </div>
-
-  <div class="modal modal-blur fade" id="modal-icd10" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" x-text="title">Pencarian ICD 10 </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="table-responsive col-sm-12">
-            <table id="diagnosa-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm" style="width: 100%;">
-              <thead>
-                <tr>
-                  <th class="text-center">No.</th>
-                  <th class="text-center">Kode</th>
-                  <th class="text-center">Nama ICD</th>
-                  <th class="text-center">Nama Indonesia</th>
-                  <th class="text-center">Act</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 @endsection
 
 
@@ -210,44 +183,6 @@
     let kunjungan = {!! json_encode($kunjungan) !!}
     let asesmenPerawat = {!! json_encode($asesmenKeperawatan) !!};
     let asesmenMedis = {!! json_encode($asesmenMedis) !!};
-
-    const table = new DataTable('#diagnosa-table', {
-      processing: true,
-      serverSide: true,
-      autoWidth: false,
-      destroy: true,
-      ajax: route('api.master.icd10.dt'),
-      order: [
-        [
-          1, 'asc'
-        ]
-      ],
-      columns: [{
-          data: 'DT_RowIndex',
-          name: 'DT_RowIndex',
-          orderable: false,
-          searchable: false,
-          sClass: 'text-center',
-          width: '5%'
-        },
-        {
-          "data": "code"
-        },
-        {
-          "data": "display_en"
-        },
-        {
-          "data": "display_id"
-        },
-        {
-          data: 'action',
-          name: 'action',
-          sClass: 'text-center',
-          width: "10%"
-        },
-      ]
-    });
-
 
     document.addEventListener('alpine:init', () => {
       Alpine.data('form', () => ({
@@ -307,18 +242,6 @@
               });
             }
           })
-        },
-
-        selectIcd10(row) {
-          this.form.icd10_id = row.id;
-          this.icd10_selected = `${row.code} - ${row.display_en}`;
-
-          Toast.fire({
-            icon: 'success',
-            title: this.icd10_selected + ' berhasil dipilih'
-          });
-
-          $('#modal-icd10').modal('hide');
         },
 
         init() {
@@ -411,11 +334,6 @@
         }
       }))
     })
-
-    const selectIcd10 = (row) => {
-      const alpineComponent = Alpine.$data(document.querySelector('[x-data="form"]'));
-      alpineComponent.selectIcd10(row);
-    }
   </script>
 
   @stack('pemeriksaan-js')
