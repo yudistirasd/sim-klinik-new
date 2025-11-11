@@ -31,6 +31,9 @@ class KunjunganController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
+            ->editColumn('noregistrasi', function ($row) {
+                return "<a href='" . route('pemeriksaan.index', $row->id) . "'>{$row->noregistrasi}</a>";
+            })
             ->editColumn('alamat', function ($row) {
                 return "{$row->pasien->alamat}, {$row->pasien->kelurahan->name}, {$row->pasien->kecamatan->name}, {$row->pasien->kabupaten->name}, {$row->pasien->provinsi->name}";
             })
@@ -46,6 +49,7 @@ class KunjunganController extends Controller
             })
             ->rawColumns([
                 'action',
+                'noregistrasi'
             ])
             ->make(true);
     }

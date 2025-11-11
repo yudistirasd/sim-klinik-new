@@ -6,6 +6,7 @@ use App\Http\Controllers\Master\ProdukController;
 use App\Http\Controllers\Master\RuanganController;
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\Master\WilayahController;
+use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\Registrasi\KunjunganController;
 use App\Http\Controllers\Registrasi\PasienController;
 use Illuminate\Http\Request;
@@ -59,5 +60,10 @@ Route::group(['as' => 'api.'], function () {
                 'departemen' => 'departemen'
             ]
         ]);
+    });
+
+    Route::group(['prefix' => 'pemeriksaan', 'as' => 'pemeriksaan'], function () {
+        Route::post('asesmen-keperawatan', [PemeriksaanController::class, 'storeAsesmenKeperawatan'])->name('store.asesmen-keperawatan');
+        Route::post('asesmen-medis', [PemeriksaanController::class, 'asesmenMedis'])->name('store.asesmen-perawat');
     });
 });

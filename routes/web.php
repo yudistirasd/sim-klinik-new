@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\Master\DepartemenController;
 use App\Http\Controllers\Master\ProdukController;
 use App\Http\Controllers\Master\RuanganController;
+use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\Registrasi\PasienController;
 use App\Http\Controllers\Registrasi\KunjunganController;
 use Illuminate\Support\Facades\Route;
@@ -40,4 +41,8 @@ Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.', 'middleware' => '
     Route::get('kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.index');
     Route::get('kunjungan/{pasien}', [KunjunganController::class, 'create'])->name('kunjungan.create');
     Route::get('kunjungan/edit/{kunjungan}', [KunjunganController::class, 'edit'])->name('kunjungan.edit');
+});
+
+Route::group(['prefix' => 'pemeriksaan', 'as' => 'pemeriksaan.', 'middleware' => 'auth'], function () {
+    Route::get('{kunjungan}', [PemeriksaanController::class, 'index'])->name('index');
 });
