@@ -499,7 +499,8 @@
             data: {
               pasien_id: pasien.id,
               kunjungan_id: kunjungan.id,
-              icd10_id: row.id
+              icd10_id: row.id,
+              created_by: kunjungan.dokter_id
             },
             dataType: 'json',
             headers: {
@@ -546,7 +547,8 @@
             data: {
               pasien_id: pasien.id,
               kunjungan_id: kunjungan.id,
-              icd9_id: row.id
+              icd9_id: row.id,
+              created_by: kunjungan.dokter_id
             },
             dataType: 'json',
             headers: {

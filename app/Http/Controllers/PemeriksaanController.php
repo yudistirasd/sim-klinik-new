@@ -18,10 +18,14 @@ class PemeriksaanController extends Controller
 {
     public function dtDiagnosa(Request $request)
     {
+        $currentUser = Auth::user();
+
+
         $data = DB::table('diagnosa_pasien as dp')
             ->join('icd10', 'icd10.id', '=', 'dp.icd10_id')
             ->select([
                 'dp.id',
+                'dp.created_by',
                 'icd10.code',
                 'icd10.display_en',
                 'icd10.display_id',
@@ -32,7 +36,11 @@ class PemeriksaanController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('action', function ($row) {
+            ->addColumn('action', function ($row) use ($currentUser) {
+                if ($currentUser->id != $row->created_by) {
+                    return '';
+                }
+
                 return "
                                 <button type='button' class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.pemeriksaan.destroy.diagnosa-pasien', $row->id) . "`, diagnosaPasienTable.ajax.reload)'>
                                     <i class='ti ti-trash'></i>
@@ -48,10 +56,13 @@ class PemeriksaanController extends Controller
 
     public function dtProsedure(Request $request)
     {
+        $currentUser = Auth::user();
+
         $data = DB::table('prosedure_pasien as pp')
             ->join('icd9', 'icd9.id', '=', 'pp.icd9_id')
             ->select([
                 'pp.id',
+                'pp.created_by',
                 'icd9.code',
                 'icd9.display_en',
                 'icd9.display_id',
@@ -62,8 +73,10 @@ class PemeriksaanController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('action', function ($row) {
-
+            ->addColumn('action', function ($row) use ($currentUser) {
+                if ($currentUser->id != $row->created_by) {
+                    return '';
+                }
 
                 return "
                                 <button type='button' class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.pemeriksaan.destroy.prosedure-pasien', $row->id) . "`, prosedurePasienTable.ajax.reload)'>
@@ -178,7 +191,8 @@ class PemeriksaanController extends Controller
         DiagnosaPasien::updateOrCreate([
             'pasien_id' => $request->pasien_id,
             'kunjungan_id' => $request->kunjungan_id,
-            'icd10_id' => $request->icd10_id
+            'icd10_id' => $request->icd10_id,
+            'created_by' => $request->created_by
         ]);
 
         return $this->sendResponse(message: __('http-response.success.store', ['Attribute' => 'Diagnosa Pasien']));
@@ -196,7 +210,8 @@ class PemeriksaanController extends Controller
         ProsedurePasien::updateOrCreate([
             'pasien_id' => $request->pasien_id,
             'kunjungan_id' => $request->kunjungan_id,
-            'icd9_id' => $request->icd9_id
+            'icd9_id' => $request->icd9_id,
+            'created_by' => $request->created_by
         ]);
 
         return $this->sendResponse(message: __('http-response.success.store', ['Attribute' => 'Prosedure Pasien']));
