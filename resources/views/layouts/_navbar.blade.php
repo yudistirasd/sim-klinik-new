@@ -95,7 +95,7 @@
                     Farmasi
                   </a>
                   <div class="dropdown-menu">
-                    <a href="./sign-in.html" class="dropdown-item"> Obat </a>
+                    <a href="{{ route('master.produk.index', ['jenis' => 'obat']) }}" class="dropdown-item"> Obat </a>
                   </div>
                 </div>
               </div>

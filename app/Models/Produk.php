@@ -18,4 +18,9 @@ class Produk extends Model
     {
         return $query->where('jenis', 'tindakan');
     }
+
+    public function scopeObat($query)
+    {
+        return $query->where('jenis', 'obat');
+    }
 }

@@ -20,6 +20,7 @@ class ProdukController extends Controller
         return DataTables::of($produk)
             ->addIndexColumn()
             ->editColumn('tarif', fn($row) => formatUang($row->tarif))
+            ->editColumn('dosis', fn($row) => $row->dosis . ' ' . $row->satuan)
             ->addColumn('action', function ($row) {
                 return "
                                 <button class='btn btn-warning btn-icon' onclick='handleModal(`edit`, `Ubah Produk`, " . json_encode($row) . ")'>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Master\DepartemenController;
+use App\Http\Controllers\Master\FarmasiController;
 use App\Http\Controllers\Master\ICDController;
 use App\Http\Controllers\Master\ProdukController;
 use App\Http\Controllers\Master\RuanganController;
@@ -33,6 +34,10 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
         Route::get('icd10/dt', [ICDController::class, 'icd10dt'])->name('icd10.dt');
         Route::get('icd9/dt', [ICDController::class, 'icd9dt'])->name('icd9.dt');
 
+        Route::get('farmasi/satuan-dosis', [FarmasiController::class, 'satuanDosis'])->name('farmasi.satuan-dosis.get');
+        Route::post('farmasi/satuan-dosis', [FarmasiController::class, 'storeSatuanDosis'])->name('farmasi.satuan-dosis.store');
+        Route::get('farmasi/sediaan-obat', [FarmasiController::class, 'sediaan'])->name('farmasi.sediaan.get');
+        Route::post('farmasi/sediaan-obat', [FarmasiController::class, 'storeSediaan'])->name('farmasi.sediaan.store');
 
         Route::apiResources([
             'pengguna' => UserController::class,

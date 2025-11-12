@@ -21,9 +21,19 @@ class UpdateProdukRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required',
-            'tarif' => 'required'
+        $rules = [
+            'tindakan' => [
+                'name' => 'required',
+                'tarif' => 'required'
+            ],
+            'obat' => [
+                'name' => 'required',
+                'dosis' => 'required',
+                'satuan' => 'required',
+                'sediaan' => 'required'
+            ]
         ];
+
+        return $rules[$this->jenis];
     }
 }

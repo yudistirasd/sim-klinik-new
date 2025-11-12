@@ -102,6 +102,12 @@
         }
       });
 
+      $.ajaxSetup({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+      });
+
       const confirmDelete = (endpoint, callback) => {
         Swal.fire({
           title: "Apakah anda yakin akan menghapus data ini?",
