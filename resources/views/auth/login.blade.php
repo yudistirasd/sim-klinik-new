@@ -21,7 +21,7 @@
         <div class="text-center mb-4">
           <!-- BEGIN NAVBAR LOGO -->
           <a href="." aria-label="Tabler" class="navbar-brand navbar-brand-autodark">
-            <img src="{{ asset('img/logo-tabler.png') }}" height="36" alt="">
+            <img src="{{ asset('logo.png') }}" height="36" alt="">
           </a><!-- END NAVBAR LOGO -->
         </div>
         <div class="card card-md">
