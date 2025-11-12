@@ -1,5 +1,5 @@
 <a href="#" class="nav-link d-flex lh-1 p-0 px-2" data-bs-toggle="dropdown" aria-label="Open user menu">
-  <span class="avatar avatar-sm" style="background-image: url({{ asset('storage/avatars/' . Auth::user()->avatar) }})"> </span>
+  <span class="avatar avatar-sm" style="background-image: url(https://ui-avatars.com/api/name={{ urlencode(Auth::user()->name_plain) }}?background=random)"> </span>
   <div class="d-none d-xl-block ps-2">
     <div>{{ Auth::user()->name }}</div>
     <div class="mt-1 small text-secondary">{{ Auth::user()->role }}</div>

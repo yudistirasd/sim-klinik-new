@@ -90,6 +90,14 @@
                 <a class="dropdown-item" href="{{ route('master.produk.index', ['jenis' => 'tindakan']) }}">
                   Tindakan
                 </a>
+                <div class="dropend">
+                  <a class="dropdown-item dropdown-toggle" href="#sidebar-authentication" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                    Farmasi
+                  </a>
+                  <div class="dropdown-menu">
+                    <a href="./sign-in.html" class="dropdown-item"> Obat </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

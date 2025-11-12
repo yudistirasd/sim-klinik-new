@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Str;
 
 class User extends Authenticatable
 {
@@ -38,6 +39,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = ['name_plain'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -48,6 +51,15 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    public function getNamePlainAttribute(): string
+    {
+        return Str::of($this->name)
+            ->replaceMatches('/^(drg?|prof|apt|ns|ir|hj|h|bpk|ibu)\.?(\s+)/i', '')
+            ->replaceMatches('/,\s*(S\.?\w+|M\.?\w+|A\.?Md\.?\w*|Sp\.?\w*|Ph\.?D|Drs\.?|Dra\.?)(\.|\s|$)/i', '')
+            ->replaceMatches('/\s{2,}/', ' ')
+            ->trim(' ,');
     }
 
     public function generateAvatar()
