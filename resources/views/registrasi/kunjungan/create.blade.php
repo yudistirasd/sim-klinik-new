@@ -358,27 +358,8 @@
                 clear: 'ti ti-trash',
                 close: 'ti ti-xmark'
               },
-              //   sideBySide: true,
-              //   calendarWeeks: false,
               viewMode: 'calendar',
               toolbarPlacement: 'bottom',
-              //   keepOpen: false,
-              //   buttons: {
-              //     today: false,
-              //     clear: false,
-              //     close: false
-              //   },
-              //   components: {
-              //     calendar: true,
-              //     date: true,
-              //     month: true,
-              //     year: true,
-              //     decades: true,
-              //     clock: true,
-              //     hours: true,
-              //     minutes: true,
-              //     seconds: false,
-              //   },
               theme: 'light',
             },
             localization: {
