@@ -57,9 +57,11 @@
         <div class="dropdown-menu">
           <div class="dropdown-menu-columns">
             <div class="dropdown-menu-column">
-              <a class="dropdown-item" href="{{ route('registrasi.pasien.index') }}">
-                Daftar Pasien
-              </a>
+              @if (Auth::user()->role == 'admin')
+                <a class="dropdown-item" href="{{ route('registrasi.pasien.index') }}">
+                  Daftar Pasien
+                </a>
+              @endif
               <a class="dropdown-item" href="{{ route('registrasi.kunjungan.index') }}">
                 Daftar Kunjungan Pasien
               </a>

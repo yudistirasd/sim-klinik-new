@@ -18,6 +18,8 @@ class KunjunganController extends Controller
 {
     public function dt()
     {
+        $currentUser = Auth::user();
+
         $data = Kunjungan::query()
             ->with([
                 'pasien',
@@ -27,7 +29,10 @@ class KunjunganController extends Controller
                 'pasien.kelurahan',
                 'ruangan',
                 'dokter',
-            ]);
+            ])
+            ->when($currentUser->role == 'dokter', function ($query) use ($currentUser) {
+                $query->where('dokter_id', $currentUser->id);
+            });
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -37,7 +42,11 @@ class KunjunganController extends Controller
             ->editColumn('alamat', function ($row) {
                 return "{$row->pasien->alamat}, {$row->pasien->kelurahan->name}, {$row->pasien->kecamatan->name}, {$row->pasien->kabupaten->name}, {$row->pasien->provinsi->name}";
             })
-            ->addColumn('action', function ($row) {
+            ->addColumn('action', function ($row) use ($currentUser) {
+                if ($currentUser->role != 'admin') {
+                    return "";
+                }
+
                 return "
                                 <a class='btn btn-warning btn-icon' href='" . route('registrasi.kunjungan.edit', $row->id) . "'>
                                     <i class='ti ti-edit'></i>
