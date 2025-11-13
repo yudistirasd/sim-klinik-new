@@ -1,6 +1,6 @@
 <div x-data="Resep" x-init="init()">
 
-  <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
+  <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt" x-show="isUserDokter">
     <div class="row">
       <div class="col-md-4 col-sm-12">
         <div class="mb-3">
@@ -176,6 +176,7 @@
         endPoint: '',
         errors: {},
         loading: false,
+        isUserDokter: currentUser.role == 'dokter',
 
         handleSubmit() {
 

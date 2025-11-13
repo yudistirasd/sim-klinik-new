@@ -181,6 +181,7 @@
   <script src="{{ asset('libs/datatables/dataTables.responsive.min.js') }}?{{ config('app.version') }}"></script>
   <script src="{{ asset('libs/datatables/responsive.bootstrap5.js') }}?{{ config('app.version') }}"></script>
   <script>
+    let currentUser = {!! Auth::user() !!};
     let pasien = {!! json_encode($pasien) !!};
     let kunjungan = {!! json_encode($kunjungan) !!}
     let asesmenPerawat = {!! json_encode($asesmenKeperawatan) !!};

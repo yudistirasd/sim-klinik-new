@@ -1,22 +1,24 @@
 <div x-data="Tindakan" x-init="init()">
 
-  <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
-    <div class="mb-3 row">
-      <label class="col-3 col-form-label">Tindakan</label>
-      <div class="col">
-        <select class="form-control" id="provinsi" name="produk_id" :class="{ 'is-invalid': errors.produk_id }">
-          <option value=""></option>
-        </select>
-        <div class="invalid-feedback" x-text="errors.produk_id"></div>
+  @if (in_array(Auth::user()->role, ['admin', 'dokter']))
+    <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
+      <div class="mb-3 row">
+        <label class="col-3 col-form-label">Tindakan</label>
+        <div class="col">
+          <select class="form-control" id="provinsi" name="produk_id" :class="{ 'is-invalid': errors.produk_id }">
+            <option value=""></option>
+          </select>
+          <div class="invalid-feedback" x-text="errors.produk_id"></div>
+        </div>
       </div>
-    </div>
-    <div class="mb-3 text-end">
-      <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
-        <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
-        Simpan
-      </button>
-    </div>
-  </form>
+      <div class="mb-3 text-end">
+        <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+          <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Simpan
+        </button>
+      </div>
+    </form>
+  @endif
 
   <table id="tindakan-pasien-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm mt-3" style="width: 100%;">
     <thead>
@@ -31,7 +33,7 @@
     <tfoot>
       <tr>
         <th colspan="2" class="text-end">Total</th>
-        <th></th>
+        <th id="total"></th>
       </tr>
     </tfoot>
   </table>
@@ -69,7 +71,12 @@
           sClass: 'text-center',
           width: "10%"
         },
-      ]
+      ],
+      footerCallback: function(tfoot, data, start, end, display) {
+        var api = this.api();
+        var json = api.ajax.json();
+        $('#total').html(json.total)
+      }
     });
 
 

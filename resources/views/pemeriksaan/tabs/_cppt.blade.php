@@ -1,54 +1,56 @@
 <div x-data="CPPT" x-init="init()">
 
-  <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
-    <div class="mb-3 row">
-      <label class="col-3 col-form-label">Petugas Pelaksana</label>
-      <div class="col-3">
-        <input type="text" disabled x-model="form.jenis_user" class="form-control text-uppercase"></input>
-      </div>
-      <div class="col">
-        <input type="text" disabled value="{{ Auth::user()->name }}" class="form-control"></input>
-      </div>
-    </div>
-    <div class="mb-3 row">
-      <label class="col-3 col-form-label">Subjektif</label>
-      <div class="col">
-        <textarea type="text" x-model="form.subjective" class="form-control"></textarea>
-      </div>
-    </div>
-    <div class="mb-3 row">
-      <label class="col-3 col-form-label">Objektif</label>
-      <div class="col">
-        <textarea type="text" x-model="form.objective" class="form-control"></textarea>
-      </div>
-    </div>
-    <div class="mb-3 row">
-      <label class="col-3 col-form-label">Anamnesa</label>
-      <div class="col">
-        <textarea type="text" x-model="form.asesmen" class="form-control"></textarea>
-      </div>
-    </div>
-    <div class="mb-3 row">
-      <label class="col-3 col-form-label">Plan</label>
-      <div class="col">
-        <textarea type="text" x-model="form.plan" class="form-control"></textarea>
-      </div>
-    </div>
-    @if (Auth::user()->role == 'dokter')
+  @if (in_array(Auth::user()->role, ['dokter', 'perawat']))
+    <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
       <div class="mb-3 row">
-        <label class="col-3 col-form-label">Edukasi Pasien</label>
+        <label class="col-3 col-form-label">Petugas Pelaksana</label>
+        <div class="col-3">
+          <input type="text" disabled x-model="form.jenis_user" class="form-control text-uppercase"></input>
+        </div>
         <div class="col">
-          <textarea type="text" x-model="form.edukasi" class="form-control"></textarea>
+          <input type="text" disabled value="{{ Auth::user()->name }}" class="form-control"></input>
         </div>
       </div>
-    @endif
-    <div class="mb-3 text-end">
-      <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
-        <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
-        Simpan
-      </button>
-    </div>
-  </form>
+      <div class="mb-3 row">
+        <label class="col-3 col-form-label">Subjektif</label>
+        <div class="col">
+          <textarea type="text" x-model="form.subjective" class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-3 col-form-label">Objektif</label>
+        <div class="col">
+          <textarea type="text" x-model="form.objective" class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-3 col-form-label">Anamnesa</label>
+        <div class="col">
+          <textarea type="text" x-model="form.asesmen" class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <label class="col-3 col-form-label">Plan</label>
+        <div class="col">
+          <textarea type="text" x-model="form.plan" class="form-control"></textarea>
+        </div>
+      </div>
+      @if (Auth::user()->role == 'dokter')
+        <div class="mb-3 row">
+          <label class="col-3 col-form-label">Edukasi Pasien</label>
+          <div class="col">
+            <textarea type="text" x-model="form.edukasi" class="form-control"></textarea>
+          </div>
+        </div>
+      @endif
+      <div class="mb-3 text-end">
+        <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+          <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
+          Simpan
+        </button>
+      </div>
+    </form>
+  @endif
 
   <table id="cppt-pasien-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm mt-3" style="width: 100%;">
     <thead>

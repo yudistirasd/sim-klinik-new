@@ -1,5 +1,5 @@
 <div x-data="AsesmenKeperawatan" x-init="init()">
-  <form @submit.prevent="handleSubmit" autocomplete="off">
+  <form @submit.prevent="handleSubmit" autocomplete="off" id="form-askep">
     <div class="card">
       <div class="card-header bg-primary text-white">
         <h3 class="card-title">Keadaan Umum</h3>
@@ -257,7 +257,7 @@
             </div>
           </div>
           <div class="col-md-6 col-sm-12 text-end">
-            <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+            <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading || !isUserPerawat">
               <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
               Simpan
             </button>
@@ -272,6 +272,10 @@
 @push('pemeriksaan-js')
   <script>
     document.addEventListener('alpine:init', () => {
+      if (currentUser.role != 'perawat') {
+        $('#form-askep').find('input, textarea, select').prop('disabled', true);
+      }
+
       Alpine.data('AsesmenKeperawatan', () => ({
         petugas: '',
         form: {
@@ -303,6 +307,7 @@
         endPoint: '',
         errors: {},
         loading: false,
+        isUserPerawat: currentUser.role == 'perawat',
 
         handleSubmit() {
           this.loading = true;

@@ -148,16 +148,24 @@ class PemeriksaanController extends Controller
 
     public function dtTindakan(Request $request)
     {
+
+        $currentUser = Auth::user();
+
         $data = PelayananPasien::query()->with('produk')
             ->where('kunjungan_id', $request->kunjungan_id);
+
+        $total = PelayananPasien::where('kunjungan_id', $request->kunjungan_id)
+            ->sum('harga');
 
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('harga', function ($row) {
                 return formatUang($row->harga);
             })
-            ->addColumn('action', function ($row) {
-
+            ->addColumn('action', function ($row) use ($currentUser) {
+                if ($currentUser->role == 'perawat') {
+                    return "";
+                }
                 return "
                                 <button type='button' class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.pemeriksaan.destroy.tindakan', $row->id) . "`, tindakanPasienTable.ajax.reload)'>
                                     <i class='ti ti-trash'></i>
@@ -167,11 +175,14 @@ class PemeriksaanController extends Controller
             ->rawColumns([
                 'action',
             ])
+            ->with('total', formatUang($total))
             ->make(true);
     }
 
     public function dtResep(Request $request)
     {
+        $currentUser = Auth::user();
+
         $data = DB::table('resep as rs')
             ->join('resep_detail as rd', 'rd.resep_id', '=', 'rs.id')
             ->join('produk as pr', 'pr.id', '=', 'rd.produk_id')
@@ -186,12 +197,13 @@ class PemeriksaanController extends Controller
                 'tr.name as takaran',
                 'ap.name as aturan_pakai',
                 'rs.status'
-            ]);
+            ])
+            ->where('rs.kunjungan_id', $request->kunjungan_id);
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                if ($row->status == 'VERIFIED') {
+            ->addColumn('action', function ($row)  use ($currentUser) {
+                if ($row->status == 'VERIFIED' || $currentUser->role != 'dokter') {
                     return "";
                 }
                 return "

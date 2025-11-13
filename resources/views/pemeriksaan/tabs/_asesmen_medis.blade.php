@@ -1,5 +1,5 @@
 <div x-data="AsesmenMedis" x-init="init()">
-  <form @submit.prevent="handleSubmit" autocomplete="off">
+  <form @submit.prevent="handleSubmit" autocomplete="off" id="form-asmed">
     <div class="card">
       <div class="card-header bg-primary text-white">
         <h3 class="card-title">Anamnesis</h3>
@@ -77,7 +77,6 @@
           </div>
         </div>
 
-
         <div class="mb-3 row">
           <label class="col-3 col-form-label">Keadaan Umum</label>
           <div class="col">
@@ -136,9 +135,9 @@
       <div class="card-body">
         <div class="row mb-3">
           <div class="col-12">
-            <a href="javascript:;" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modal-icd10">
+            <button href="javascript:;" class="btn btn-sm" {{ !Auth::user()->hasRole('dokter') ? 'disabled' : '' }} data-bs-toggle="modal" data-bs-target="#modal-icd10">
               <div class="ti ti-search"></div> Cari Diagnosa
-            </a>
+            </button>
           </div>
         </div>
 
@@ -166,9 +165,9 @@
       <div class="card-body">
         <div class="row mb-3">
           <div class="col-12">
-            <a href="javascript:;" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#modal-icd9">
+            <button href="javascript:;" class="btn btn-sm" {{ !Auth::user()->hasRole('dokter') ? 'disabled' : '' }} data-bs-toggle="modal" data-bs-target="#modal-icd9">
               <div class="ti ti-search"></div> Cari Prosedure
-            </a>
+            </button>
           </div>
         </div>
 
@@ -189,7 +188,7 @@
       </div>
 
       <div class="card-footer text-end">
-        <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+        <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading || !isUserDokter">
           <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
           Simpan
         </button>
@@ -402,6 +401,11 @@
 
 
     document.addEventListener('alpine:init', () => {
+
+      if (currentUser.role != 'dokter') {
+        $('#form-asmed').find('input, textarea, select').prop('disabled', true);
+      }
+
       Alpine.data('AsesmenMedis', () => ({
         form: {
           pasien_id: pasien.id,
@@ -425,6 +429,7 @@
         endPoint: '',
         errors: {},
         loading: false,
+        isUserDokter: currentUser.role == 'dokter',
 
         handleSubmit() {
           this.loading = true;
