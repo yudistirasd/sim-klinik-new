@@ -14,7 +14,7 @@
   <div class="card">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table dataTable table-striped table-sm  table-hover" id="pasien-table">
+        <table class="table dataTable table-striped table-sm table-hover" id="pasien-table">
           <thead>
             <tr>
               <th class="text-center">#</th>
@@ -26,6 +26,7 @@
               <th class="text-center">Alamat</th>
               <th class="text-center">Ruangan / Klinik</th>
               <th class="text-center">Dokter</th>
+              <th class="text-center">EMR</th>
               <th class="text-center">Aksi</th>
             </tr>
             <tr class="filter-row">
@@ -38,6 +39,7 @@
               <th></th>
               <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
               <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th></th>
               <th></th>
             </tr>
           </thead>
@@ -125,6 +127,11 @@
         {
           data: 'dokter.name',
           name: 'dokter.name',
+          sClass: 'text-start'
+        },
+        {
+          data: 'status',
+          name: 'status',
           sClass: 'text-start'
         },
         {

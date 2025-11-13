@@ -25,7 +25,7 @@ class Pasien extends Model
     public function getUsia($tanggalKunjungan = null)
     {
         if (!$this->tanggal_lahir) {
-            return null;
+            return '-';
         }
 
         $tglLahir = Carbon::parse($this->tanggal_lahir);
@@ -33,25 +33,21 @@ class Pasien extends Model
             ? Carbon::parse($tanggalKunjungan)
             : Carbon::now();
 
-        // Hindari error kalau tanggal kunjungan < tanggal lahir
-        if ($tglAcuan->lt($tglLahir)) {
-            return '0 hari';
-        }
-
         $diff = $tglLahir->diff($tglAcuan);
 
-        $parts = [];
-        if ($diff->y > 0) {
-            $parts[] = "{$diff->y} tahun";
-        }
-        if ($diff->m > 0) {
-            $parts[] = "{$diff->m} bulan";
-        }
-        if ($diff->d > 0) {
-            $parts[] = "{$diff->d} hari";
+        // --- LOGIKA BARU ---
+        // 1. ≥ 1 tahun → tampil TAHUN saja
+        if ($diff->y >= 1) {
+            return "{$diff->y} tahun";
         }
 
-        return implode(' ', $parts) ?: '0 hari';
+        // 2. < 1 tahun, tetapi ≥ 1 bulan → tampil BULAN saja
+        if ($diff->m >= 1) {
+            return "{$diff->m} bulan";
+        }
+
+        // 3. < 1 bulan → tampil HARI saja
+        return "{$diff->d} hari";
     }
 
     /**

@@ -29,6 +29,12 @@ class KunjunganController extends Controller
                 'pasien.kelurahan',
                 'ruangan',
                 'dokter',
+                'asmed' => function ($query) {
+                    $query->select(['id', 'kunjungan_id']);
+                },
+                'askep' => function ($query) {
+                    $query->select(['id', 'kunjungan_id']);
+                }
             ])
             ->when($currentUser->role == 'dokter', function ($query) use ($currentUser) {
                 $query->where('dokter_id', $currentUser->id);
@@ -41,6 +47,19 @@ class KunjunganController extends Controller
             })
             ->editColumn('alamat', function ($row) {
                 return "{$row->pasien->alamat}, {$row->pasien->kelurahan->name}, {$row->pasien->kecamatan->name}, {$row->pasien->kabupaten->name}, {$row->pasien->provinsi->name}";
+            })
+            ->addColumn('status', function ($row) {
+                $askep = "";
+                $asmed = "";
+
+                if ($row->askep?->id) {
+                    $askep = "<span class='badge badge-sm bg-green text-green-fg m-1'>Askep<i class='ti ti-checkbox ms-1'></i></span>";
+                }
+
+                if ($row->asmed?->id) {
+                    $asmed = "<span class='badge badge-sm bg-blue text-blue-fg m-1'>Asmed<i class='ti ti-checkbox ms-1'></i></span>";
+                }
+                return "{$asmed} {$askep}";
             })
             ->addColumn('action', function ($row) use ($currentUser) {
                 if ($currentUser->role != 'admin') {
@@ -57,6 +76,7 @@ class KunjunganController extends Controller
                             ";
             })
             ->rawColumns([
+                'status',
                 'action',
                 'noregistrasi'
             ])

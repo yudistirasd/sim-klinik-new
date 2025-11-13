@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\ICD10;
 
 class Kunjungan extends Model
@@ -52,5 +53,25 @@ class Kunjungan extends Model
     public function jenisPenyakit(): BelongsTo
     {
         return $this->belongsTo(ICD10::class, 'icd10_id');
+    }
+
+    /**
+     * Get the asmed associated with the Kunjungan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function asmed(): HasOne
+    {
+        return $this->hasOne(AsesmenMedis::class);
+    }
+
+    /**
+     * Get the askep associated with the Kunjungan
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function askep(): HasOne
+    {
+        return $this->hasOne(AsesmenKeperawatan::class);
     }
 }
