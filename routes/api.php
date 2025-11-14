@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Kasir\TagihanPasienController;
 use App\Http\Controllers\Master\DepartemenController;
 use App\Http\Controllers\Master\FarmasiController;
 use App\Http\Controllers\Master\ICDController;
@@ -105,5 +106,10 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
 
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
         Route::get('scorecard-admin', [DashboardController::class, 'scoreCardAdmin'])->name('scorecard.admin');
+    });
+
+    Route::group(['prefix' => 'kasir', 'as' => 'kasir.'], function () {
+        Route::get('tagihan-pasien/dt', [TagihanPasienController::class, 'dt'])->name('tagihan.dt');
+        Route::post('tagihan-pasien/{kunjungan}', [TagihanPasienController::class, 'bayar'])->name('tagihan.bayar');
     });
 });

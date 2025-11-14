@@ -3,6 +3,7 @@
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Kasir\TagihanPasienController;
 use App\Http\Controllers\Master\DepartemenController;
 use App\Http\Controllers\Master\ProdukController;
 use App\Http\Controllers\Master\RuanganController;
@@ -21,29 +22,30 @@ Route::post('/login', [AuthenticationController::class, 'authenticate'])
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-});
+
+    Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
+        Route::get('pengguna', [UserController::class, 'index'])->name('pengguna.index');
+        Route::get('departemen', [DepartemenController::class, 'index'])->name('departemen.index');
+        Route::get('ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
+        Route::get('produk/{jenis}', [ProdukController::class, 'index'])->name('produk.index');
+        Route::get('suplier', [SuplierController::class, 'index'])->name('suplier.index');
+    });
 
 
+    Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.'], function () {
+        Route::get('pasien', [PasienController::class, 'index'])->name('pasien.index');
+        Route::get('pasien/create', [PasienController::class, 'create'])->name('pasien.create');
+        Route::get('pasien/{pasien}/edit', [PasienController::class, 'edit'])->name('pasien.edit');
 
-Route::group(['prefix' => 'master', 'as' => 'master.', 'middleware' => 'auth'], function () {
-    Route::get('pengguna', [UserController::class, 'index'])->name('pengguna.index');
-    Route::get('departemen', [DepartemenController::class, 'index'])->name('departemen.index');
-    Route::get('ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
-    Route::get('produk/{jenis}', [ProdukController::class, 'index'])->name('produk.index');
-    Route::get('suplier', [SuplierController::class, 'index'])->name('suplier.index');
-});
+        Route::get('kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.index');
+        Route::get('kunjungan/{pasien}', [KunjunganController::class, 'create'])->name('kunjungan.create');
+        Route::get('kunjungan/edit/{kunjungan}', [KunjunganController::class, 'edit'])->name('kunjungan.edit');
+    });
+
+    Route::group(['prefix' => 'pemeriksaan', 'as' => 'pemeriksaan.'], function () {
+        Route::get('{kunjungan}', [PemeriksaanController::class, 'index'])->name('index');
+    });
 
 
-Route::group(['prefix' => 'registrasi', 'as' => 'registrasi.', 'middleware' => 'auth'], function () {
-    Route::get('pasien', [PasienController::class, 'index'])->name('pasien.index');
-    Route::get('pasien/create', [PasienController::class, 'create'])->name('pasien.create');
-    Route::get('pasien/{pasien}/edit', [PasienController::class, 'edit'])->name('pasien.edit');
-
-    Route::get('kunjungan', [KunjunganController::class, 'index'])->name('kunjungan.index');
-    Route::get('kunjungan/{pasien}', [KunjunganController::class, 'create'])->name('kunjungan.create');
-    Route::get('kunjungan/edit/{kunjungan}', [KunjunganController::class, 'edit'])->name('kunjungan.edit');
-});
-
-Route::group(['prefix' => 'pemeriksaan', 'as' => 'pemeriksaan.', 'middleware' => 'auth'], function () {
-    Route::get('{kunjungan}', [PemeriksaanController::class, 'index'])->name('index');
+    Route::get('kasir/tagihan-pasien', [TagihanPasienController::class, 'index'])->name('kasir.tagihan-pasien');
 });
