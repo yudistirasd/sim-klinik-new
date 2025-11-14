@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\Cetak\TagihanPasienController as CetakTagihanPasienController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Kasir\TagihanPasienController;
 use App\Http\Controllers\Master\DepartemenController;
@@ -48,4 +49,5 @@ Route::middleware('auth')->group(function () {
 
 
     Route::get('kasir/tagihan-pasien', [TagihanPasienController::class, 'index'])->name('kasir.tagihan-pasien');
+    Route::get('kasir/tagihan-pasien/cetak/{kunjungan}', [CetakTagihanPasienController::class, 'index'])->name('kasir.tagihan-pasien.cetak');
 });

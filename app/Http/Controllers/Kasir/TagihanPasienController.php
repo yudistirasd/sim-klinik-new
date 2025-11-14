@@ -80,7 +80,7 @@ class TagihanPasienController extends Controller
             ->addColumn('jumlah_tagihan', fn($row) => formatUang($row->layanan))
             ->addColumn('action', function ($row) {
                 if ($row->status_bayar == 'lunas') {
-                    return "";
+                    return "<a href='" . route('kasir.tagihan-pasien.cetak', $row->id) . "' class='btn btn-secondary btn-sm'><i class='ti ti-printer me-1'></i>Nota</a>";
                 }
                 return " <button class='btn btn-dark btn-sm' onclick='handleModalBayar(" . json_encode($row) . ")'>
                                     <i class='ti ti-credit-card-pay me-1'></i> Bayar
