@@ -506,6 +506,7 @@
             this.form.tanggal = resep.tanggal;
             this.form.nomor = resep.nomor;
           } else {
+            this.form.nomor = '';
             this.form.tanggal = kunjungan.tanggal_registrasi;
           }
           this.datePicker.dates.setValue(new tempusDominus.DateTime(this.form.tanggal));
