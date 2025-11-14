@@ -37,7 +37,7 @@ return new class extends Migration
                 AS
             \$\$
             BEGIN
-                new.nomor := (select to_char(current_timestamp, 'YYMMDD')||lpad((select nextval('noregistrasi_seq'))::text, 5, '0'));
+                new.nomor := 'R' || (select to_char(current_timestamp, 'YYMMDD')||lpad((select nextval('noregistrasi_seq'))::text, 5, '0'));
 
                 RETURN NEW;
             END;
