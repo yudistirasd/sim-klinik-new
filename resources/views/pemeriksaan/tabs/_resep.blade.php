@@ -12,7 +12,7 @@
         <div class="col-md-4 col-sm-12">
           <div class="mb-3">
             <label class="form-label">No Resep</label>
-            <input type="number" disabled class="form-control" autocomplete="off" placeholder="Otomatis dari sistem" x-model="form.nomor" :class="{ 'is-invalid': errors.nomor }">
+            <input type="text" disabled class="form-control" autocomplete="off" placeholder="Otomatis dari sistem" x-model="form.nomor" :class="{ 'is-invalid': errors.nomor }">
             <div class="invalid-feedback" x-text="errors.nomor"></div>
           </div>
         </div>
