@@ -13,6 +13,7 @@ use App\Http\Controllers\Master\WilayahController;
 use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\Registrasi\KunjunganController;
 use App\Http\Controllers\Registrasi\PasienController;
+use App\Http\Controllers\Stok\ProdukStokController;
 use App\Http\Controllers\Transaksi\PembelianController;
 use App\Http\Controllers\Transaksi\PembelianDetailController;
 use Illuminate\Http\Request;
@@ -125,5 +126,9 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
 
         Route::apiResource('pembelian', PembelianController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('pembelian.detail', PembelianDetailController::class)->only(['store', 'update', 'destroy']);
+    });
+
+    Route::group(['prefix' => 'stok', 'as' => 'stok.'], function () {
+        Route::get('/dt', [ProdukStokController::class, 'dt'])->name('dt');
     });
 });

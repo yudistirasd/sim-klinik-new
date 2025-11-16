@@ -12,6 +12,7 @@ use App\Http\Controllers\Master\SuplierController;
 use App\Http\Controllers\PemeriksaanController;
 use App\Http\Controllers\Registrasi\PasienController;
 use App\Http\Controllers\Registrasi\KunjunganController;
+use App\Http\Controllers\Stok\ProdukStokController;
 use App\Http\Controllers\Transaksi\PembelianController;
 use Illuminate\Support\Facades\Route;
 
@@ -55,5 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'transaksi', 'as' => 'transaksi.'], function () {
         Route::get('pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
         Route::get('pembelian/{pembelian}', [PembelianController::class, 'show'])->name('pembelian.show');
+    });
+
+    Route::group(['prefix' => 'stok', 'as' => 'stok.'], function () {
+        Route::get('/', [ProdukStokController::class, 'index'])->name('index');
     });
 });
