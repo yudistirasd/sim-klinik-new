@@ -14,6 +14,7 @@ use App\Http\Controllers\Registrasi\PasienController;
 use App\Http\Controllers\Registrasi\KunjunganController;
 use App\Http\Controllers\Farmasi\ProdukStokController;
 use App\Http\Controllers\Farmasi\PembelianController;
+use App\Http\Controllers\Farmasi\ResepPasienController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AuthenticationController::class, 'showLoginForm'])
@@ -57,7 +58,6 @@ Route::middleware('auth')->group(function () {
         Route::get('pembelian', [PembelianController::class, 'index'])->name('pembelian.index');
         Route::get('pembelian/{pembelian}', [PembelianController::class, 'show'])->name('pembelian.show');
         Route::get('stok-obat', [ProdukStokController::class, 'index'])->name('stok-obat.index');
+        Route::get('resep', [ResepPasienController::class, 'index'])->name('resep-pasien.index');
     });
-
-    Route::group(['prefix' => 'stok', 'as' => 'stok.'], function () {});
 });

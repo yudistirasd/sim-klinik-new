@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ProdukStok extends Model
+class PenjualanDetail extends Model
 {
     use HasUuids;
 
-    protected $table = 'produk_stok';
+    protected $table = 'penjualan_detail';
     public $guarded  = [];
 }

@@ -16,6 +16,7 @@ use App\Http\Controllers\Registrasi\PasienController;
 use App\Http\Controllers\Farmasi\PembelianController;
 use App\Http\Controllers\Farmasi\PembelianDetailController;
 use App\Http\Controllers\Farmasi\ProdukStokController;
+use App\Http\Controllers\Farmasi\ResepPasienController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -128,5 +129,8 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
         Route::apiResource('pembelian.detail', PembelianDetailController::class)->only(['store', 'update', 'destroy']);
 
         Route::get('stok-obat/dt', [ProdukStokController::class, 'dt'])->name('stok-obat.dt');
+        Route::get('resep-pasien/dt', [ResepPasienController::class, 'dt'])->name('resep-pasien.dt');
+        Route::get('resep-pasien/{resep}', [ResepPasienController::class, 'show'])->name('resep-pasien.show');
+        Route::post('resep-pasien/verifikasi/{resep}', [ResepPasienController::class, 'verifikasi'])->name('resep-pasien.verifikasi');
     });
 });

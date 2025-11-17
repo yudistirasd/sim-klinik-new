@@ -1,0 +1,380 @@
+@extends('layouts.app')
+
+@section('title', 'Resep Pasien')
+@section('subtitle', 'Farmasi')
+
+@push('css')
+  <link href="{{ asset('libs/datatables/dataTables.bootstrap5.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
+  <link href="{{ asset('libs/datatables/fixedHeader.bootstrap5.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
+  <link href="{{ asset('libs/datatables/responsive.bootstrap5.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
+@endpush
+
+@section('content')
+  <!-- Table -->
+  <div class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table dataTable table-striped table-sm table-hover" id="pasien-table">
+          <thead>
+            <tr>
+              <th class="text-center">#</th>
+              <th class="text-center">Tanggal Registrasi</th>
+              <th class="text-center">No RM</th>
+              <th class="text-center">No Registrasi</th>
+              <th class="text-center">Nama Pasien</th>
+              <th class="text-center">Alamat</th>
+              <th class="text-center">Ruangan / Klinik</th>
+              <th class="text-center">Dokter</th>
+              <th class="text-center">No Resep</th>
+              <th class="text-center">Status</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+            {{-- <tr class="filter-row">
+              <th></th>
+              <th><input type="date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}"></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th></th>
+              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
+              <th></th>
+            </tr> --}}
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div x-data="form">
+    <form @submit.prevent="handleSubmit" autocomplete="off">
+      <div class="modal modal-blur fade" id="modal-verifikasi" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-fullscreen" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Resep Pasien</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Tgl Registrasi</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.tanggal">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">No Registrasi</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.noregistrasi">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">No RM</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.norm">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Nama Pasien</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.nama">
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Alamat Pasien</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.alamat">
+                  </div>
+                </div>
+
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Ruangan</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.ruang">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Dokter</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="form.dokter">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <table id="resep-pasien-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm mt-3" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th class="text-center">No.</th>
+                      <th class="text-center">Obat</th>
+                      <th class="text-center">Signa</th>
+                      <th class="text-center">Takaran</th>
+                      <th class="text-center">Aturan Pakai</th>
+                      <th class="text-center">Jumlah Obat</th>
+                      <th class="text-center">Harga Jual Satuan</th>
+                      <th class="text-center">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                  <tfoot>
+                    <tr>
+                      <th colspan="7" class="text-end">Total</th>
+                      <th class="text-end" id="total_obat"></th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+                <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
+                Verifikasi Resep
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+@endsection
+
+
+@push('js')
+  <script src="{{ asset('libs/datatables/dataTables.min.js') }}?{{ config('app.version') }}"></script>
+  <script src="{{ asset('libs/datatables/dataTables.bootstrap5.min.js') }}?{{ config('app.version') }}"></script>
+  <script src="{{ asset('libs/datatables/dataTables.fixedHeader.min.js') }}?{{ config('app.version') }}"></script>
+  <script src="{{ asset('libs/datatables/dataTables.responsive.min.js') }}?{{ config('app.version') }}"></script>
+  <script src="{{ asset('libs/datatables/responsive.bootstrap5.js') }}?{{ config('app.version') }}"></script>
+  <script>
+    const table = new DataTable('#pasien-table', {
+      processing: true,
+      serverSide: true,
+      autoWidth: false,
+      destroy: true,
+      searchDelay: 500,
+      ajax: route('api.farmasi.resep-pasien.dt'),
+      orderCellsTop: true,
+      initComplete: function() {
+        this.api()
+          .columns()
+          .every(function() {
+            const column = this;
+            $('input', $('.filter-row th').eq(column.index()))
+              .on('input', function() {
+                column.search(this.value).draw();
+              });
+          });
+      },
+      columns: [{
+          data: 'DT_RowIndex',
+          name: 'DT_RowIndex',
+          orderable: false,
+          searchable: false,
+          sClass: 'text-center',
+          width: '5%'
+        },
+        {
+          data: 'tanggal_registrasi',
+          name: 'tanggal_registrasi',
+          sClass: 'text-center'
+        },
+        {
+          data: 'norm',
+          name: 'norm',
+          sClass: 'text-center'
+        },
+        {
+          data: 'noregistrasi',
+          name: 'noregistrasi',
+          sClass: 'text-center'
+        },
+        {
+          data: 'nama',
+          name: 'nama',
+          sClass: 'text-start'
+        },
+        {
+          data: 'alamat_lengkap',
+          name: 'alamat_lengkap',
+          sClass: 'text-start',
+          searchable: true,
+          orderable: false
+        },
+        {
+          data: 'ruangan',
+          name: 'ruangan',
+          sClass: 'text-center'
+        },
+        {
+          data: 'dokter',
+          name: 'dokter',
+          sClass: 'text-start'
+        },
+        {
+          data: 'nomor',
+          name: 'nomor',
+          sClass: 'text-center'
+        },
+        {
+          data: 'status',
+          name: 'status',
+          sClass: 'text-center'
+        },
+        {
+          data: 'action',
+          name: 'action',
+          sClass: 'text-center',
+          width: "10%"
+        },
+      ]
+    });
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('form', () => ({
+        form: {
+          kunjungan_id: null,
+          noregistrasi: '',
+          tanggal: '',
+          norm: '',
+          nama: '',
+          alamat: '',
+          ruang: '',
+          dokter: '',
+        },
+        tableResepObat: {},
+        endPoint: '',
+        errors: {},
+        loading: false,
+
+        modalControl(row) {
+          this.resetForm();
+
+          this.form.kunjungan_id = row.id;
+          this.form.noregistrasi = row.noregistrasi;
+          this.form.tanggal = row.tanggal_registrasi;
+          this.form.nama = row.nama;
+          this.form.norm = row.norm;
+          this.form.alamat = row.alamat_lengkap;
+          this.form.ruang = row.ruangan;
+          this.form.dokter = row.dokter;
+
+          this.endPoint = route('api.farmasi.resep-pasien.verifikasi', row.resep_id);
+
+          $('#modal-verifikasi').modal('show');
+
+          this.resepObat = new DataTable('#resep-pasien-table', {
+            dom: 'Brti',
+            processing: true,
+            serverSide: true,
+            autoWidth: false,
+            destroy: true,
+            ajax: route('api.farmasi.resep-pasien.show', {
+              resep: row.resep_id
+            }),
+            pageLength: 50,
+            columns: [{
+                data: 'DT_RowIndex',
+                name: 'DT_RowIndex',
+                orderable: false,
+                searchable: false,
+                sClass: 'text-center',
+                width: '5%'
+              },
+              {
+                data: "obat",
+              },
+              {
+                data: "signa",
+                sClass: 'text-center',
+              },
+              {
+                data: "takaran",
+                sClass: 'text-center',
+              },
+              {
+                data: "aturan_pakai",
+                sClass: 'text-center',
+              },
+              {
+                data: "qty_dibutuhkan",
+                sClass: 'text-center',
+              },
+              {
+                data: "harga_jual",
+                sClass: 'text-end',
+              },
+              {
+                data: "total",
+                sClass: 'text-end',
+              },
+            ],
+            footerCallback: function(tfoot, data, start, end, display) {
+              var api = this.api();
+              var json = api.ajax.json();
+
+              $('#total_obat').html(json.total_obat)
+            }
+          });
+
+        },
+
+        handleSubmit() {
+          this.loading = true;
+          this.errors = {};
+
+          $.ajax({
+            url: this.endPoint,
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            complete: () => {
+              this.loading = false;
+            }
+          }).done((response) => {
+            $('#modal-verifikasi').modal('hide');
+            this.resetForm();
+            table.ajax.reload();
+            Toast.fire({
+              icon: 'success',
+              title: response.message
+            });
+          }).fail((error) => {
+            if (error.status === 422) {
+              this.errors = error.responseJSON.errors;
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan !',
+                text: error.responseJSON.message
+              });
+            }
+          })
+        },
+
+        resetForm() {
+          this.form = {
+            kunjungan_id: null,
+            noregistrasi: '',
+            tanggal: '',
+            nama: '',
+            norm: '',
+            alamat: '',
+            ruang: '',
+            dokter: '',
+          };
+          this.errors = {};
+        }
+      }))
+    })
+
+    const handleModalVerif = (row) => {
+      const alpineComponent = Alpine.$data(document.querySelector('[x-data="form"]'));
+      alpineComponent.modalControl(row);
+    }
+  </script>
+@endpush
