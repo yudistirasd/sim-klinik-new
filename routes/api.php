@@ -108,7 +108,7 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
 
         Route::get('resep', [PemeriksaanController::class, 'dtResep'])->name('get.resep');
         Route::post('resep', [PemeriksaanController::class, 'storeResep'])->name('store.resep');
-        Route::delete('resep/{detail}', [PemeriksaanController::class, 'destroyResepDetail'])->name('destroy.resep-detail');
+        Route::delete('resep/{resep}/{receipt_number}', [PemeriksaanController::class, 'destroyResepDetail'])->name('destroy.resep-detail');
     });
 
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {

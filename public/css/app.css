@@ -97,3 +97,14 @@ a:hover:has(.ti) {
 .select2-container--bootstrap-5 .select2-selection--single {
     padding: 0.5625rem 1rem;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}

@@ -7,15 +7,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - {{ config('app.name') }}</title>
+
+    <!-- Alpine JS -->
+    <script defer src="{{ asset('libs/alphine-js/cdn.min.js') }}?{{ config('app.version') }}"></script>
+
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
     <link href="{{ asset('css/tabler.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
-    <link href="{{ asset('css/app.css') }}?{{ config('app.version') }}" rel="stylesheet" />
     <link href="{{ asset('css/tabler-icons.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
     <link href="{{ asset('css/inter.css') }}?{{ config('app.version') }}" rel="stylesheet" />
-    <link href="{{ asset('libs/sweetalert2/sweetalert2.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- END GLOBAL MANDATORY STYLES -->
+
+    <link href="{{ asset('libs/tempus-dominus/tempus-dominus.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
+    <link href="{{ asset('libs/sweetalert2/sweetalert2.min.css') }}?{{ config('app.version') }}" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link href="{{ asset('css/app.css') }}?{{ config('app.version') }}" rel="stylesheet" />
     @stack('css')
   </head>
 
@@ -79,15 +85,16 @@
     </div>
     @routes()
     <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
-    <!-- Popperjs -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-    <!-- Tempus Dominus JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('js/tabler-theme.min.js') }}?{{ config('app.version') }}" defer></script>
     <script src="{{ asset('js/tabler.min.js') }}?{{ config('app.version') }}" defer></script>
     <script src="{{ asset('libs/jquery/jquery-3.7.0.min.js') }}?{{ config('app.version') }}"></script>
+    <!-- Popperjs -->
+    <script src="{{ asset('libs/tempus-dominus/popper.min.js') }}?{{ config('app.version') }}" crossorigin="anonymous"></script>
+    <!-- Tempus Dominus JavaScript -->
     <script src="{{ asset('libs/sweetalert2/sweetalert2.all.min.js') }}?{{ config('app.version') }}"></script>
-    <script src="https://unpkg.com/imask"></script>
+    <script src="{{ asset('libs/imask/dist/imask.min.js') }}?{{ config('app.version') }}"></script>
+    <script src="{{ asset('libs/tempus-dominus/tempus-dominus.min.js') }}?{{ config('app.version') }}"></script>
+
     <!-- END GLOBAL MANDATORY SCRIPTS -->
     <script>
       const Toast = Swal.mixin({

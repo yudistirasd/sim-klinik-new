@@ -14,9 +14,11 @@ use App\Models\ProsedurePasien;
 use App\Models\Resep;
 use App\Models\ResepDetail;
 use Auth;
+use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Str;
 
 class PemeriksaanController extends Controller
 {
@@ -183,40 +185,72 @@ class PemeriksaanController extends Controller
     {
         $currentUser = Auth::user();
 
-        $data = DB::table('resep as rs')
+        $resep = Resep::with(['dokter'])->where('kunjungan_id', $request->kunjungan_id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $details = DB::table('resep as rs')
             ->join('resep_detail as rd', 'rd.resep_id', '=', 'rs.id')
             ->join('produk as pr', 'pr.id', '=', 'rd.produk_id')
-            ->join('takaran_obat as tr', 'tr.id', '=', 'rd.takaran_id')
             ->join('aturan_pakai_obat as ap', 'ap.id', '=', 'rd.aturan_pakai_id')
             ->select([
+                'rs.id as resep_id',
+                'rs.status',
                 'rs.nomor',
                 DB::raw("pr.name || ' ' || pr.dosis || ' ' || pr.satuan as obat"),
+                'pr.sediaan',
+                'pr.satuan as satuan_dosis',
                 'rd.id',
                 'rd.signa',
                 'rd.qty',
                 'rd.lama_hari',
-                'tr.name as takaran',
+                'rd.receipt_number',
+                'rd.jenis_resep',
+                'rd.tipe_racikan',
+                'rd.jumlah_racikan',
+                'rd.kemasan_racikan',
+                'rd.total_dosis_obat',
+                'rd.dosis_per_racikan',
+                'rd.dosis_per_satuan',
+                'rd.catatan',
                 'ap.name as aturan_pakai',
-                'rs.status'
             ])
-            ->where('rs.kunjungan_id', $request->kunjungan_id);
+            ->where('rs.kunjungan_id', $request->kunjungan_id)
+            ->get();
 
-        return DataTables::of($data)
-            ->addIndexColumn()
-            ->addColumn('action', function ($row)  use ($currentUser) {
-                if ($row->status == 'VERIFIED' || $currentUser->role != 'dokter') {
-                    return "";
-                }
-                return "
-                                <button type='button' class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.pemeriksaan.destroy.resep-detail', $row->id) . "`, resepObat.ajax.reload)'>
-                                    <i class='ti ti-trash'></i>
-                                </button>
-                            ";
-            })
-            ->rawColumns([
-                'action',
-            ])
-            ->make(true);
+        $resep->map(function ($row) use ($details) {
+            $row->tanggal = Carbon::parse($row->created_at)->translatedFormat('d F Y');
+            // non racikan
+            $items = $details->where('resep_id', $row->id)->where('jenis_resep', 'non_racikan');
+
+            // racikan
+            $headerRacikan = $details->where('resep_id', $row->id)->where('jenis_resep', 'racikan')->groupBy('receipt_number')->map->first();
+
+            foreach ($headerRacikan as $header) {
+                $item = (object) [
+                    'jenis_resep'       => $header->jenis_resep,
+                    'receipt_number'      => $header->receipt_number,
+                    'tipe_racikan'        => $header->tipe_racikan,
+                    'jumlah_racikan'      => $header->jumlah_racikan,
+                    'kemasan_racikan'     => $header->kemasan_racikan,
+                    'signa'               => $header->signa,
+                    'aturan_pakai'        => $header->aturan_pakai,
+                    'catatan' => $header->catatan,
+                    'obat' => "Racikan " . tipeRacikan($header->tipe_racikan),
+                    'komposisi' => $details->where('receipt_number', $header->receipt_number)
+                        ->where('jenis_resep', 'racikan')
+                ];
+
+
+                $items->push($item);
+            }
+            $row->items = $items->sortBy('receipt_number');
+            return $row;
+        });
+
+        $view = view('pemeriksaan.tabs._resep_table', compact('resep', 'currentUser'))->render();
+
+        return $this->sendResponse(data: $view);
     }
 
     public function index(Kunjungan $kunjungan)
@@ -365,17 +399,63 @@ class PemeriksaanController extends Controller
                 ]);
             }
 
-            ResepDetail::create([
-                'resep_id' => $resep->id,
-                'produk_id' => $request->produk_id,
-                'signa' => $request->signa,
-                'frekuensi' => $request->frekuensi,
-                'unit_dosis' => $request->unit_dosis,
-                'lama_hari' => $request->lama_hari,
-                'qty' => $request->qty,
-                'takaran_id' => $request->takaran_id,
-                'aturan_pakai_id' => $request->aturan_pakai_id,
-            ]);
+            if ($request->jenis_resep == 'non_racikan') {
+                ResepDetail::create([
+                    'resep_id' => $resep->id,
+                    'produk_id' => $request->produk_id,
+                    'signa' => $request->signa,
+                    'frekuensi' => $request->frekuensi,
+                    'unit_dosis' => $request->unit_dosis,
+                    'lama_hari' => $request->lama_hari,
+                    'qty' => $request->qty,
+                    'aturan_pakai_id' => $request->aturan_pakai_id,
+                ]);
+            }
+
+            if ($request->jenis_resep == 'racikan') {
+                $receipt_number = ResepDetail::where('resep_id', $resep->id)
+                    ->max('receipt_number') + 1;
+
+                $komposisiRacikan = $request->komposisi_racikan;
+
+                foreach ($komposisiRacikan as $komposisi) {
+                    $komposisi = (object) $komposisi;
+
+                    // hitung qty berdasarkan total_dosis_obat dan jumlah_racikan
+                    if ($request->tipe_racikan == 'non_dtd') {
+                        // dibulatkan keatas 2 desimal
+                        $dosis_per_racikan = ceil($komposisi->total_dosis_obat / $request->jumlah_racikan * 100) / 100;
+                        $qty = ceil($komposisi->total_dosis_obat / $komposisi->dosis_per_satuan);
+                    }
+
+                    if ($request->tipe_racikan == 'dtd') {
+                        $dosis_per_racikan = $komposisi->dosis_per_racikan;
+                        $qty = ceil($komposisi->dosis_per_racikan / $komposisi->dosis_per_satuan * $request->jumlah_racikan);
+                    }
+
+                    $data = [
+                        'jenis_resep' => $request->jenis_resep,
+                        'receipt_number' => $receipt_number,
+                        'resep_id' => $resep->id,
+                        'produk_id' => $komposisi->produk_id,
+                        'signa' => $request->signa,
+                        'frekuensi' => $request->frekuensi,
+                        'unit_dosis' => $request->unit_dosis,
+                        'aturan_pakai_id' => $request->aturan_pakai_id,
+                        'tipe_racikan' => $request->tipe_racikan,
+                        'jumlah_racikan' => $request->jumlah_racikan,
+                        'kemasan_racikan' => $request->kemasan_racikan,
+                        'total_dosis_obat' => $komposisi->total_dosis_obat,
+                        'dosis_per_racikan' => $dosis_per_racikan,
+                        'dosis_per_satuan' => $komposisi->dosis_per_satuan,
+                        'qty' => $qty,
+                        'catatan' => $request->catatan
+                    ];
+
+                    ResepDetail::create($data);
+                }
+            }
+
 
             $resep = $resep->refresh();
 
@@ -389,9 +469,12 @@ class PemeriksaanController extends Controller
         }
     }
 
-    public function destroyResepDetail(ResepDetail $detail)
+    public function destroyResepDetail(Resep $resep, $receiptNumber)
     {
-        $detail->delete();
+
+        ResepDetail::where('resep_id', $resep->id)
+            ->where('receipt_number', $receiptNumber)
+            ->delete();
 
         return $this->sendResponse(message: __('http-response.success.delete', ['Attribute' => 'Obat']));
     }

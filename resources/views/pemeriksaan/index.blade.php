@@ -9,6 +9,8 @@
   <link href="{{ asset('libs/datatables/dataTables.bootstrap5.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
   <link href="{{ asset('libs/datatables/fixedHeader.bootstrap5.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
   <link href="{{ asset('libs/datatables/responsive.bootstrap5.min.css') }}?{{ config('app.version') }}" rel="stylesheet">
+
+  @stack('pemeriksaan-css')
 @endpush
 
 @section('action-page')
@@ -120,7 +122,7 @@
         <div class="card-header">
           <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs" role="tablist">
             <li class="nav-item" role="presentation">
-              <a href="#tabs-asesmen-medis" class="nav-link active" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Asesmen Medis</a>
+              <a href="#tabs-asesmen-medis" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Asesmen Medis</a>
             </li>
             <li class="nav-item" role="presentation">
               <a href="#tabs-asesmen-perawat" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Asesmen Keperawatan</a>
@@ -135,7 +137,7 @@
               <a href="#tabs-resep" class="nav-link" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">Resep</a>
             </li>
             <li class="nav-item ms-auto" role="presentation">
-              <a href="#tabs-settings-1" class="nav-link" title="Settings" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab"><!-- Download SVG icon from http://tabler.io/icons/icon/settings -->
+              <a href="#tabs-settings-1" class="nav-link active" title="Settings" data-bs-toggle="tab" aria-selected="false" tabindex="-1" role="tab"><!-- Download SVG icon from http://tabler.io/icons/icon/settings -->
                 <i class="ti ti-settings"></i>
               </a>
             </li>
@@ -143,7 +145,7 @@
         </div>
         <div class="card-body">
           <div class="tab-content">
-            <div class="tab-pane active show" id="tabs-asesmen-medis" role="tabpanel">
+            <div class="tab-pane" id="tabs-asesmen-medis" role="tabpanel">
               @include('pemeriksaan.tabs._asesmen_medis')
             </div>
             <div class="tab-pane" id="tabs-asesmen-perawat" role="tabpanel">
@@ -155,7 +157,7 @@
             <div class="tab-pane" id="tabs-tindakan" role="tabpanel">
               @include('pemeriksaan.tabs._tindakan')
             </div>
-            <div class="tab-pane" id="tabs-resep" role="tabpanel">
+            <div class="tab-pane active show" id="tabs-resep" role="tabpanel">
               @include('pemeriksaan.tabs._resep')
             </div>
             <div class="tab-pane" id="tabs-settings-1" role="tabpanel">
