@@ -54,7 +54,7 @@
         <div class="dropdown-menu">
           <div class="dropdown-menu-columns">
             <div class="dropdown-menu-column">
-              @if (Auth::user()->role == 'admin')
+              @if (Auth::user()->hasRole(['admin', 'apoteker', 'loket']))
                 <a class="dropdown-item" href="{{ route('registrasi.pasien.index') }}">
                   Daftar Pasien
                 </a>
@@ -66,7 +66,7 @@
           </div>
         </div>
       </li>
-      @if (Auth::user()->hasRole(['admin', 'apoteker']))
+      @if (Auth::user()->hasRole(['admin', 'apoteker', 'loket']))
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/package -->
@@ -84,6 +84,8 @@
             </div>
           </div>
         </li>
+      @endif
+      @if (Auth::user()->hasRole(['admin', 'apoteker']))
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/package -->
@@ -109,7 +111,7 @@
         </li>
       @endif
 
-      @if (Auth::user()->hasRole(['admin', 'apoteker']))
+      @if (Auth::user()->hasRole(['admin', 'apoteker', 'loket']))
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
             <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler.io/icons/icon/package -->

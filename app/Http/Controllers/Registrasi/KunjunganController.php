@@ -39,6 +39,9 @@ class KunjunganController extends Controller
             ])
             ->when($currentUser->role == 'dokter', function ($query) use ($currentUser) {
                 $query->where('dokter_id', $currentUser->id);
+            })
+            ->when($currentUser->role == 'loket', function ($query) use ($currentUser) {
+                $query->whereIn('ruangan_id', $currentUser->ruangan->pluck('id'));
             });
 
         return DataTables::of($data)

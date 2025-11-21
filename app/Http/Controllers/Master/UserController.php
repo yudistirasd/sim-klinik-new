@@ -8,7 +8,8 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
-
+use App\Models\Ruangan;
+use Illuminate\Http\Request;
 use Satusehat\Integration\OAuth2Client;
 
 class UserController extends Controller
@@ -24,13 +25,16 @@ class UserController extends Controller
 
                 if ($row->username != 'admin') {
                     return "
-                                <button class='btn btn-warning btn-icon' onclick='handleModal(`edit`, `Ubah Pengguna`, " . json_encode($row) . ")'>
-                                    <i class='ti ti-edit'></i>
-                                </button>
-                                <button class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.master.pengguna.destroy', $row->id) . "`, table.ajax.reload)'>
-                                    <i class='ti ti-trash'></i>
-                                </button>
-                            ";
+                            <a class='btn btn-dark btn-icon' href='" . route('master.pengguna.setting', $row->id) . "'>
+                                <i class='ti ti-settings'></i>
+                            </a>
+                            <button class='btn btn-warning btn-icon' onclick='handleModal(`edit`, `Ubah Pengguna`, " . json_encode($row) . ")'>
+                                <i class='ti ti-edit'></i>
+                            </button>
+                            <button class='btn btn-danger btn-icon' onclick='confirmDelete(`" . route('api.master.pengguna.destroy', $row->id) . "`, table.ajax.reload)'>
+                                <i class='ti ti-trash'></i>
+                            </button>
+                    ";
                 }
             })
             ->rawColumns([
@@ -83,6 +87,25 @@ class UserController extends Controller
 
             return $this->sendError(message: __('http-response.error.store', ['Attribute' => 'Pengguna']), errors: $th->getMessage(), traces: $th->getTrace());
         }
+    }
+
+    public function setting(User $pengguna)
+    {
+        $ruangan = Ruangan::all();
+
+        return view('master.pengguna.setting', compact('pengguna', 'ruangan'));
+    }
+
+    public function storeSettingRuangan(User $pengguna, Request $request)
+    {
+        $request->validate([
+            'ruangan_id' => 'required',
+            'user_id' => 'required'
+        ]);
+
+        $pengguna->ruangan()->syncWithoutDetaching($request->ruangan_id);
+
+        return $this->sendResponse(message: __('http-response.success.update', ['Attribute' => 'Pengaturan Ruangan Pengguna']));
     }
 
     public function update(UpdateUserRequest $request, User $pengguna)

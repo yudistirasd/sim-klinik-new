@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Kasir;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kunjungan;
+use App\Models\PelayananPasien;
 use App\Models\Penjualan;
 use App\Models\Resep;
+use Auth;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
@@ -15,6 +17,7 @@ class TagihanPasienController extends Controller
 {
     public function dt()
     {
+        $currentUser = Auth::user()->load('ruangan');
 
         $data = DB::table('kunjungan_pasien as kp')
             ->withExpression(
@@ -44,6 +47,7 @@ class TagihanPasienController extends Controller
                         'kel.name as kelurahan',
                         'dokter.name as dokter',
                     ])
+                    ->whereIn('kj.ruangan_id', $currentUser->ruangan->pluck('id'))
             )
             ->withExpression(
                 'pelayanan',
@@ -55,22 +59,10 @@ class TagihanPasienController extends Controller
                     ->whereRaw('kunjungan_id in (select id from kunjungan_pasien)')
                     ->groupBy('kunjungan_id')
             )
-            ->withExpression(
-                'penjualan_obat',
-                DB::table('penjualan_detail as pd')
-                    ->select([
-                        'kunjungan_id',
-                        DB::raw("string_agg(DISTINCT resep_id::text, ',') as resep_id"),
-                        DB::raw('coalesce(sum(total), 0) as obat')
-                    ])
-                    ->whereRaw('kunjungan_id in (select id from kunjungan_pasien)')
-                    ->groupBy(['kunjungan_id'])
-            )
             ->leftJoin('pelayanan as pl', 'pl.kunjungan_id', '=', 'kp.id')
-            ->leftJoin('penjualan_obat as po', 'po.kunjungan_id', '=', 'kp.id')
             ->select([
                 '*',
-                DB::raw('coalesce(layanan, 0) + coalesce(obat, 0) as jumlah_tagihan'),
+                DB::raw('coalesce(layanan, 0) as jumlah_tagihan'),
                 DB::raw("alamat || ', ' || kelurahan || ', ' || kecamatan  || ', ' || kabupaten || ', ' || provinsi as alamat_lengkap")
             ]);
 
@@ -90,7 +82,7 @@ class TagihanPasienController extends Controller
             })
             ->addColumn('action', function ($row) {
                 if ($row->status_bayar == 'lunas') {
-                    return "<a href='" . route('kasir.tagihan-pasien.cetak', $row->id) . "' class='btn btn-secondary btn-sm'><i class='ti ti-printer me-1'></i>Nota</a>";
+                    return "<a href='" . route('kasir.tagihan-pasien.cetak', $row->id) . "' target='_blank' class='btn btn-secondary btn-sm'><i class='ti ti-printer me-1'></i>Nota</a>";
                 }
                 return " <button class='btn btn-dark btn-sm' onclick='handleModalBayar(" . json_encode($row) . ")'>
                                     <i class='ti ti-credit-card-pay me-1'></i> Bayar
@@ -107,6 +99,17 @@ class TagihanPasienController extends Controller
     public function index()
     {
         return view('kasir.tagihan.index');
+    }
+
+    public function show(Kunjungan $kunjungan)
+    {
+        $tindakan = PelayananPasien::query()->with('produk')
+            ->where('kunjungan_id', $kunjungan->id)
+            ->get();
+
+        $view = view('kasir.tagihan._table_tagihan', compact('tindakan', 'kunjungan'))->render();
+
+        return $this->sendResponse(data: $view);
     }
 
     public function bayar(Request $request, Kunjungan $kunjungan)

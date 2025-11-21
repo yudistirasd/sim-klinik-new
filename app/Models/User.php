@@ -6,10 +6,14 @@ use Avatar;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Str;
+
 
 class User extends Authenticatable
 {
@@ -85,5 +89,15 @@ class User extends Authenticatable
     public function scopeDokter($query)
     {
         return $query->where('role', 'dokter');
+    }
+
+    /**
+     * Get all of the ruangan for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function ruangan(): BelongsToMany
+    {
+        return $this->belongsToMany(Ruangan::class, 'user_has_ruangan', 'user_id', 'ruangan_id');
     }
 }

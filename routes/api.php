@@ -28,6 +28,9 @@ Route::get('/user', function (Request $request) {
 Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         Route::get('pengguna/dt', [UserController::class, 'dt'])->name('pengguna.dt');
+        Route::get('pengguna/{pengguna}/setting-ruangan/dt', [UserController::class, 'dtSettingRuangan'])->name('pengguna.setting-ruangan.dt');
+        Route::post('pengguna/{pengguna}/setting-ruangan', [UserController::class, 'storeSettingRuangan'])->name('pengguna.setting-ruangan.store');
+
         Route::get('departemen/dt', [DepartemenController::class, 'dt'])->name('departemen.dt');
         Route::get('ruangan/dt', [RuanganController::class, 'dt'])->name('ruangan.dt');
         Route::get('produk/{jenis}', [ProdukController::class, 'dt'])->name('produk.dt');
@@ -117,6 +120,7 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
 
     Route::group(['prefix' => 'kasir', 'as' => 'kasir.'], function () {
         Route::get('tagihan-pasien/dt', [TagihanPasienController::class, 'dt'])->name('tagihan.dt');
+        Route::get('tagihan-pasien/{kunjungan}', [TagihanPasienController::class, 'show'])->name('tagihan.show');
         Route::post('tagihan-pasien/{kunjungan}', [TagihanPasienController::class, 'bayar'])->name('tagihan.bayar');
     });
 

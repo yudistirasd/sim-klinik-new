@@ -112,7 +112,7 @@
               </div>
 
               <div class="row">
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered table-striped" id="table-tagihan">
                   <thead>
                     <tr>
                       <th class="text-center fw-bolder" style="width: 5%">#</th>
@@ -121,20 +121,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td class="text-center">1</td>
-                      <td>Tindakan</td>
-                      <td class="text-end" x-text="form.tagihan.layanan"></td>
-                    </tr>
-                    <tr>
-                      <td class="text-center">2</td>
-                      <td>Obat</td>
-                      <td class="text-end" x-text="form.tagihan.obat">0</td>
-                    </tr>
-                    <tr>
-                      <td class="text-end fw-bolder" colspan="2">Total</td>
-                      <td class="text-end" x-text="form.tagihan.jumlah_tagihan"></td>
-                    </tr>
+
                   </tbody>
                 </table>
               </div>
@@ -279,25 +266,13 @@
           this.form.alamat = row.alamat_lengkap;
           this.form.ruang = row.ruangan;
           this.form.dokter = row.dokter;
-          this.form.tagihan = {
-            jumlah_tagihan: row.jumlah_tagihan ? Number(row.jumlah_tagihan).toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }) : 0,
-            layanan: row.layanan ? Number(row.layanan).toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }) : 0,
-            obat: row.obat ? Number(row.obat).toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2
-            }) : 0
-          }
           this.form.resep_id = row.resep_id;
 
           this.endPoint = route('api.kasir.tagihan.bayar', row.id);
 
           $('#modal-bayar').modal('show');
+
+          this.tagihan(row.id);
 
         },
 
@@ -334,6 +309,23 @@
                 text: error.responseJSON.message
               });
             }
+          })
+        },
+
+
+        tagihan(kunjungan_id) {
+          container = $('#table-tagihan tbody');
+
+          $.ajax({
+            url: route('api.kasir.tagihan.show', {
+              kunjungan: kunjungan_id,
+            }),
+            method: 'GET',
+            beforeSend: () => {
+              container.html('<tr><td colspan="3" class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
+            },
+          }).done((response) => {
+            container.html(response.data);
           })
         },
 

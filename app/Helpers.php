@@ -26,6 +26,11 @@ if (! function_exists('roles')) {
                 'name' => 'Apoteker',
                 'nakes' => true
             ],
+            (object) [
+                'id' => 'loket',
+                'name' => 'Petugas Loket',
+                'nakes' => false
+            ]
         ]);
     }
 }

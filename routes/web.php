@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
 
     Route::group(['prefix' => 'master', 'as' => 'master.'], function () {
         Route::get('pengguna', [UserController::class, 'index'])->name('pengguna.index');
+        Route::get('pengguna/{pengguna}/setting', [UserController::class, 'setting'])->name('pengguna.setting');
         Route::get('departemen', [DepartemenController::class, 'index'])->name('departemen.index');
         Route::get('ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
         Route::get('produk/{jenis}', [ProdukController::class, 'index'])->name('produk.index');

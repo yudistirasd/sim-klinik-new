@@ -2,7 +2,7 @@
 
 namespace App\Libraries\EasyTable;
 
-class easyTable
+class EasyTable
 {
     const LP = 0.4;
     const XPadding = 1;
@@ -11,11 +11,22 @@ class easyTable
     const PBThreshold = 30;
     static private $table_counter = false;
     static private $style = array(
-        'width' => false, 'border' => false, 'border-color' => false,
-        'border-width' => false, 'line-height' => false,
-        'align' => '', 'valign' => '', 'bgcolor' => false, 'split-row' => false, 'l-margin' => false,
-        'font-family' => false, 'font-style' => false, 'font-size' => false, 'font-color' => false,
-        'paddingX' => false, 'paddingY' => false
+        'width' => false,
+        'border' => false,
+        'border-color' => false,
+        'border-width' => false,
+        'line-height' => false,
+        'align' => '',
+        'valign' => '',
+        'bgcolor' => false,
+        'split-row' => false,
+        'l-margin' => false,
+        'font-family' => false,
+        'font-style' => false,
+        'font-size' => false,
+        'font-color' => false,
+        'paddingX' => false,
+        'paddingY' => false
     );
     private $pdf_obj;
     private $document_style;

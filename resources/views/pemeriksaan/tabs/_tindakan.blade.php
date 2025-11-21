@@ -3,19 +3,23 @@
   @if (in_array(Auth::user()->role, ['admin', 'dokter']))
     <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
       <div class="mb-3 row">
-        <label class="col-3 col-form-label">Tindakan</label>
+        <label class="col-2 col-form-label">Tindakan</label>
         <div class="col">
-          <select class="form-control" id="provinsi" name="produk_id" :class="{ 'is-invalid': errors.produk_id }">
-            <option value=""></option>
-          </select>
+          <div class="row">
+            <div class="col">
+              <select class="form-control" id="provinsi" name="produk_id" :class="{ 'is-invalid': errors.produk_id }">
+                <option value=""></option>
+              </select>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-2 btn-icon" :disabled="loading" aria-label="Button">
+                <span x-show="loading" class="spinner-border spinner-border-sm"></span>
+                <i class="ti ti-plus" x-show="!loading"></i>
+              </button>
+            </div>
+          </div>
           <div class="invalid-feedback" x-text="errors.produk_id"></div>
         </div>
-      </div>
-      <div class="mb-3 text-end">
-        <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
-          <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
-          Simpan
-        </button>
       </div>
     </form>
   @endif
