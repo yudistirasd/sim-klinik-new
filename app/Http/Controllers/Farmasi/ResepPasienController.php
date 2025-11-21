@@ -9,6 +9,7 @@ use App\Models\ProdukStok;
 use App\Models\Resep;
 use App\Models\ResepDetail;
 use Auth;
+use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -92,35 +93,77 @@ class ResepPasienController extends Controller
                     ps.produk_id,
                     ps.harga_jual
             )
-            SELECT
-                pro.name || ' ' || pro.dosis || ' ' || pro.satuan || ' ' || pro.sediaan as obat,
-                    pro.sediaan,
-                    rsd.signa,
-                    tko.name as takaran,
-                    apo.name as aturan_pakai,
-                    rsd.qty as qty_dibutuhkan,
-                    os.qty_tersedia,
-                    os.harga_jual,
-                    rsd.qty * os.harga_jual as total
-            FROM resep_detail rsd
-            JOIN produk pro ON pro.id = rsd.produk_id
-            JOIN takaran_obat tko ON tko.id = rsd.takaran_id
-            JOIN aturan_pakai_obat as apo ON apo.id = rsd.aturan_pakai_id
-            LEFT JOIN obat_stok as os ON os.produk_id = rsd.produk_id
-            WHERE rsd.resep_id = ?
+            select
+                rs.id as resep_id,
+                rs.status,
+                rs.nomor,
+                pr.name || ' ' || pr.dosis || ' ' || pr.satuan as obat,
+                pr.sediaan,
+                pr.satuan as satuan_dosis,
+                rd.id,
+                rd.signa,
+                rd.qty,
+                rd.lama_hari,
+                rd.receipt_number,
+                rd.jenis_resep,
+                rd.tipe_racikan,
+                rd.jumlah_racikan,
+                rd.kemasan_racikan,
+                rd.total_dosis_obat,
+                rd.dosis_per_racikan,
+                rd.dosis_per_satuan,
+                rd.catatan,
+                ap.name as aturan_pakai,
+                os.qty_tersedia,
+                os.harga_jual,
+                rd.qty * os.harga_jual as total
+            from resep as rs
+            inner join resep_detail as rd on rd.resep_id = rs.id
+            inner join produk as pr on pr.id = rd.produk_id
+            inner join aturan_pakai_obat as ap on ap.id = rd.aturan_pakai_id
+            LEFT JOIN obat_stok as os ON os.produk_id = rd.produk_id
+            where rs.id = ?
         ", [$resep->id, $resep->id]);
 
-        $totalObat = collect($data)->sum('total');
+        $details = collect($data);
 
-        return DataTables::of($data)
-            ->addIndexColumn()
-            ->editColumn('qty_diperlukan', fn($row) => $row->qty_dibutuhkan . ' ' . $row->sediaan)
-            ->editColumn('harga_jual', fn($row) => formatUang($row->harga_jual))
-            ->editColumn('total', fn($row) => formatUang($row->total))
-            ->with('total_obat', function () use ($totalObat) {
-                return formatUang($totalObat);
-            })
-            ->make(true);
+        $resep->tanggal = Carbon::parse($resep->created_at)->translatedFormat('d F Y');
+
+        if (!$details->isEmpty()) {
+            // non racikan
+            $items = $details->where('resep_id', $resep->id)->where('jenis_resep', 'non_racikan');
+
+            // racikan
+            $headerRacikan = $details->where('resep_id', $resep->id)->where('jenis_resep', 'racikan')->groupBy('receipt_number')->map->first();
+
+            foreach ($headerRacikan as $header) {
+                $item = (object) [
+                    'jenis_resep'       => $header->jenis_resep,
+                    'receipt_number'      => $header->receipt_number,
+                    'tipe_racikan'        => $header->tipe_racikan,
+                    'jumlah_racikan'      => $header->jumlah_racikan,
+                    'kemasan_racikan'     => $header->kemasan_racikan,
+                    'signa'               => $header->signa,
+                    'aturan_pakai'        => $header->aturan_pakai,
+                    'catatan' => $header->catatan,
+                    'obat' => "Racikan " . tipeRacikan($header->tipe_racikan),
+                    'komposisi' => $details->where('receipt_number', $header->receipt_number)
+                        ->where('jenis_resep', 'racikan')
+                ];
+
+
+                $items->push($item);
+            }
+            $resep->items = $items->sortBy('receipt_number');
+        } else {
+            $resep->items = [];
+        }
+
+        $resep->load(['dokter']);
+
+        $view = view('farmasi.resep-pasien._resep_table', compact('resep'))->render();
+
+        return $this->sendResponse(data: $view);
     }
 
     public function verifikasi(Resep $resep)

@@ -103,28 +103,7 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <table id="resep-pasien-table" aria-label="diagnosa" class="table table-bordered table-striped table-sm mt-3" style="width: 100%;">
-                  <thead>
-                    <tr>
-                      <th class="text-center">No.</th>
-                      <th class="text-center">Obat</th>
-                      <th class="text-center">Signa</th>
-                      <th class="text-center">Takaran</th>
-                      <th class="text-center">Aturan Pakai</th>
-                      <th class="text-center">Jumlah Obat</th>
-                      <th class="text-center">Harga Jual Satuan</th>
-                      <th class="text-center">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                  <tfoot>
-                    <tr>
-                      <th colspan="7" class="text-end">Total</th>
-                      <th class="text-end" id="total_obat"></th>
-                    </tr>
-                  </tfoot>
-                </table>
+              <div id="resep-container">
               </div>
             </div>
             <div class="modal-footer">
@@ -265,60 +244,24 @@
 
           $('#modal-verifikasi').modal('show');
 
-          this.resepObat = new DataTable('#resep-pasien-table', {
-            dom: 'Brti',
-            processing: true,
-            serverSide: true,
-            autoWidth: false,
-            destroy: true,
-            ajax: route('api.farmasi.resep-pasien.show', {
-              resep: row.resep_id
+          this.resepObat(row.resep_id);
+
+        },
+
+        resepObat(resep_id) {
+          container = $('#resep-container');
+
+          $.ajax({
+            url: route('api.farmasi.resep-pasien.show', {
+              resep: resep_id
             }),
-            pageLength: 50,
-            columns: [{
-                data: 'DT_RowIndex',
-                name: 'DT_RowIndex',
-                orderable: false,
-                searchable: false,
-                sClass: 'text-center',
-                width: '5%'
-              },
-              {
-                data: "obat",
-              },
-              {
-                data: "signa",
-                sClass: 'text-center',
-              },
-              {
-                data: "takaran",
-                sClass: 'text-center',
-              },
-              {
-                data: "aturan_pakai",
-                sClass: 'text-center',
-              },
-              {
-                data: "qty_dibutuhkan",
-                sClass: 'text-center',
-              },
-              {
-                data: "harga_jual",
-                sClass: 'text-end',
-              },
-              {
-                data: "total",
-                sClass: 'text-end',
-              },
-            ],
-            footerCallback: function(tfoot, data, start, end, display) {
-              var api = this.api();
-              var json = api.ajax.json();
-
-              $('#total_obat').html(json.total_obat)
-            }
-          });
-
+            method: 'GET',
+            beforeSend: () => {
+              container.html('<div class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</div>');
+            },
+          }).done((response) => {
+            container.html(response.data);
+          })
         },
 
         handleSubmit() {
