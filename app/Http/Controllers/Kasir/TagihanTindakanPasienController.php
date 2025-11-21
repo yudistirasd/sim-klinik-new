@@ -13,7 +13,7 @@ use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class TagihanPasienController extends Controller
+class TagihanTindakanPasienController extends Controller
 {
     public function dt()
     {
@@ -98,7 +98,7 @@ class TagihanPasienController extends Controller
 
     public function index()
     {
-        return view('kasir.tagihan.index');
+        return view('kasir.tagihan-tindakan.index');
     }
 
     public function show(Kunjungan $kunjungan)
@@ -107,7 +107,7 @@ class TagihanPasienController extends Controller
             ->where('kunjungan_id', $kunjungan->id)
             ->get();
 
-        $view = view('kasir.tagihan._table_tagihan', compact('tindakan', 'kunjungan'))->render();
+        $view = view('kasir.tagihan-tindakan._table_tagihan', compact('tindakan', 'kunjungan'))->render();
 
         return $this->sendResponse(data: $view);
     }
@@ -131,12 +131,12 @@ class TagihanPasienController extends Controller
 
             DB::commit();
 
-            return $this->sendResponse(message: 'Obat berhasil ditambahkan ke stok');
+            return $this->sendResponse(message: 'Tagihan tindakan berhasil ditambahkan ke stok');
         } catch (\Exception $ex) {
             DB::rollback();
             \Log::error($ex);
 
-            return $this->sendError(message: 'Obat gagal ditambahkan ke stok', errors: $ex->getMessage(), traces: $ex->getTrace());
+            return $this->sendError(message: 'Tagihan tindakan gagal ditambahkan ke stok', errors: $ex->getMessage(), traces: $ex->getTrace());
         }
 
 

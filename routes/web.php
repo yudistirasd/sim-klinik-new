@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\Master\UserController;
 use App\Http\Controllers\AuthenticationController;
-use App\Http\Controllers\Cetak\TagihanPasienController as CetakTagihanPasienController;
+use App\Http\Controllers\Cetak\TagihanTindakanPasienController as CetakTagihanTindakanPasienController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Kasir\TagihanPasienController;
+use App\Http\Controllers\Kasir\TagihanTindakanPasienController;
 use App\Http\Controllers\Master\DepartemenController;
 use App\Http\Controllers\Master\ProdukController;
 use App\Http\Controllers\Master\RuanganController;
@@ -52,8 +52,8 @@ Route::middleware('auth')->group(function () {
     });
 
 
-    Route::get('kasir/tagihan-pasien', [TagihanPasienController::class, 'index'])->name('kasir.tagihan-pasien');
-    Route::get('kasir/tagihan-pasien/cetak/{kunjungan}', [CetakTagihanPasienController::class, 'index'])->name('kasir.tagihan-pasien.cetak');
+    Route::get('kasir/tagihan-pasien', [TagihanTindakanPasienController::class, 'index'])->name('kasir.tagihan-pasien');
+    Route::get('kasir/tagihan-pasien/cetak/{kunjungan}', [CetakTagihanTindakanPasienController::class, 'index'])->name('kasir.tagihan-pasien.cetak');
 
     Route::group(['prefix' => 'farmasi', 'as' => 'farmasi.'], function () {
         Route::get('pembelian', [PembelianController::class, 'index'])->name('pembelian.index');

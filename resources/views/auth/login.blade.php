@@ -31,7 +31,7 @@
               @csrf
               <div class="mb-3">
                 <label class="form-label">Username</label>
-                <input type="username" name="username" class="form-control @error('username') is-invalid @enderror" placeholder="Your username" />
+                <input type="username" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username') }}" placeholder="Your username" />
                 @error('username')
                   <div class="invalid-feedback">
                     {{ $message }}

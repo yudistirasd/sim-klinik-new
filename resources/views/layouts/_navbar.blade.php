@@ -77,9 +77,16 @@
           <div class="dropdown-menu">
             <div class="dropdown-menu-columns">
               <div class="dropdown-menu-column">
-                <a class="dropdown-item" href="{{ route('kasir.tagihan-pasien') }}">
-                  Daftar Tagihan Pasien
-                </a>
+                @if (Auth::user()->hasRole(['admin', 'loket']))
+                  <a class="dropdown-item" href="{{ route('kasir.tagihan-pasien') }}">
+                    Tagihan Tindakan Pasien
+                  </a>
+                @endif
+                @if (Auth::user()->hasRole(['apoteker']))
+                  <a class="dropdown-item" href="{{ route('kasir.tagihan-pasien') }}">
+                    Tagihan Resep
+                  </a>
+                @endif
               </div>
             </div>
           </div>

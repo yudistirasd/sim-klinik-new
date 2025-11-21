@@ -154,7 +154,7 @@
       autoWidth: false,
       destroy: true,
       searchDelay: 500,
-      ajax: route('api.kasir.tagihan.dt'),
+      ajax: route('api.kasir.tagihan-tindakan.dt'),
       orderCellsTop: true,
       initComplete: function() {
         this.api()
@@ -268,7 +268,7 @@
           this.form.dokter = row.dokter;
           this.form.resep_id = row.resep_id;
 
-          this.endPoint = route('api.kasir.tagihan.bayar', row.id);
+          this.endPoint = route('api.kasir.tagihan-tindakan.bayar', row.id);
 
           $('#modal-bayar').modal('show');
 
@@ -317,7 +317,7 @@
           container = $('#table-tagihan tbody');
 
           $.ajax({
-            url: route('api.kasir.tagihan.show', {
+            url: route('api.kasir.tagihan-tindakan.show', {
               kunjungan: kunjungan_id,
             }),
             method: 'GET',

@@ -43,6 +43,7 @@ class ProdukController extends Controller
         $data = Produk::{$request->jenis}()
             ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
             ->limit(30)
+            ->orderBy('name', 'asc')
             ->get(['id', 'name as text', '*'])
             ->map(function ($row) {
                 $row->text = "{$row->text} - " . formatUang($row->tarif);

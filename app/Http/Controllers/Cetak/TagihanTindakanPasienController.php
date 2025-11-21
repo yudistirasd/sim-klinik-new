@@ -9,7 +9,7 @@ use App\Models\Kunjungan;
 use App\Models\PelayananPasien;
 use Illuminate\Http\Request;
 
-class TagihanPasienController extends Controller
+class TagihanTindakanPasienController extends Controller
 {
 
     private $pdf;

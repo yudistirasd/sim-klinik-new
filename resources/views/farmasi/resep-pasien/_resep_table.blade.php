@@ -157,10 +157,10 @@
           </thead>
 
           <tbody>
+            @php
+              $total = 0;
+            @endphp
             @foreach ($resep->items as $item)
-              @php
-                $total = 0;
-              @endphp
               <tr>
                 <td class="ps-3 text-center">R/{{ $item->receipt_number }}</td>
                 <td>

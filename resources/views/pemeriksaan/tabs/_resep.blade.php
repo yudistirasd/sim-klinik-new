@@ -208,9 +208,9 @@
           kunjungan_id: kunjungan.id,
         }),
         method: 'GET',
-        beforeSend: () => {
-          container.html('<tr><td colspan="9" class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</td></tr>');
-        },
+        // beforeSend: () => {
+        //   container.html('<div class="text-center"><span class="spinner-border spinner-border-sm me-2"></span>Loading...</div>');
+        // },
       }).done((response) => {
         container.html(response.data);
       })
@@ -304,15 +304,15 @@
           const dosisTotalObat = parseFloat(komposisi.total_dosis_obat) || 0;
           const jumlahRacikan = parseFloat(this.form.jumlah_racikan) || 0;
 
+          let qty = 0;
           if (this.form.tipe_racikan === 'non_dtd' && dosisSatuan > 0 && dosisTotalObat > 0 && jumlahRacikan > 0) {
             // Qty = dosisTotalObat / Dosis satuan
-            komposisi.qty = (dosisTotalObat / dosisSatuan).toFixed(2);
+            qty = (dosisTotalObat / dosisSatuan).toFixed(2);
           } else if (this.form.tipe_racikan === 'dtd' && dosisSatuan > 0 && dosisPeracikan > 0 && jumlahRacikan > 0) {
             // Qty = (Dosis Dibutuhkan / Dosis Satuan) × Jumlah Racikan
-            komposisi.qty = ((dosisPeracikan * jumlahRacikan) / dosisSatuan).toFixed(2);
-          } else {
-            komposisi.qty = 0;
+            qty = ((dosisPeracikan * jumlahRacikan) / dosisSatuan).toFixed(2);
           }
+          komposisi.qty = Math.ceil(qty);
 
           console.log("komposisi : ", komposisi);
         },
@@ -423,7 +423,12 @@
             lama_hari: '',
             qty: 0,
             takaran_id: '',
-            aturan_pakai_id: ''
+            aturan_pakai_id: '',
+            jenis_resep: '',
+            tipe_racikan: '',
+            kemasan_racikan: '',
+            jumlah_racikan: 0,
+            komposisi_racikan: []
           };
           this.errors = {};
 

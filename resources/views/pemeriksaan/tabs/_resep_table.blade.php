@@ -111,10 +111,10 @@
       color: #1e3a5f;
     }
   </style>
-  @foreach ($resep as $row)
+  @foreach ($resep as $key => $row)
     <!-- Resep 1: Verified -->
     <div class="card resep-card shadow-sm mb-3">
-      <div class="resep-header p-3" data-bs-toggle="collapse" data-bs-target="#resep1">
+      <div class="resep-header p-3" data-bs-toggle="collapse" data-bs-target="#{{ $row->id }}">
         <div class="row align-items-center">
           <div class="col-auto">
             <i class="ti ti-chevron-down chevron-icon text-muted"></i>
@@ -122,7 +122,7 @@
           <div class="col">
             <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
               <span class="resep-number"><i class="bi bi-file-earmark-medical me-1"></i>{{ $row->nomor }}</span>
-              @if ($row->status == 'verified')
+              @if ($row->status == 'VERIFIED')
                 <span class="badge badge-verified rounded-pill px-2 py-1">
                   <i class="ti ti-circle-check me-1"></i>Verified
                 </span>
@@ -140,7 +140,7 @@
           </div>
         </div>
       </div>
-      <div class="collapse show" id="resep1">
+      <div class="collapse {{ $key > 0 && $row->status == 'VERIFIED' ? '' : 'show' }}" id="{{ $row->id }}">
         <div class="card-body p-0 border-top">
           <table class="table table-obat">
             <thead>

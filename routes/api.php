@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Kasir\TagihanPasienController;
+use App\Http\Controllers\Kasir\TagihanTindakanPasienController;
 use App\Http\Controllers\Master\DepartemenController;
 use App\Http\Controllers\Master\FarmasiController;
 use App\Http\Controllers\Master\ICDController;
@@ -119,9 +119,9 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
     });
 
     Route::group(['prefix' => 'kasir', 'as' => 'kasir.'], function () {
-        Route::get('tagihan-pasien/dt', [TagihanPasienController::class, 'dt'])->name('tagihan.dt');
-        Route::get('tagihan-pasien/{kunjungan}', [TagihanPasienController::class, 'show'])->name('tagihan.show');
-        Route::post('tagihan-pasien/{kunjungan}', [TagihanPasienController::class, 'bayar'])->name('tagihan.bayar');
+        Route::get('tagihan-pasien/dt', [TagihanTindakanPasienController::class, 'dt'])->name('tagihan-tindakan.dt');
+        Route::get('tagihan-pasien/{kunjungan}', [TagihanTindakanPasienController::class, 'show'])->name('tagihan-tindakan.show');
+        Route::post('tagihan-pasien/{kunjungan}', [TagihanTindakanPasienController::class, 'bayar'])->name('tagihan-tindakan.bayar');
     });
 
     Route::group(['prefix' => 'farmasi', 'as' => 'farmasi.'], function () {
