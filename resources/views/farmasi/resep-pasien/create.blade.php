@@ -551,6 +551,8 @@
               title: response.message
             });
 
+            $('#modal-dokter-external').modal('hide');
+
             this.updateOptionDokter(response.data);
 
             this.resetFormDokterExternal();
