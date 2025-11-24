@@ -21,40 +21,43 @@ class PembelianDetailController extends Controller
         return DataTables::of($data)
             ->addIndexColumn()
             ->editColumn('produk.name', function ($row) {
-                return "{$row->produk->name} {$row->produk->dosis} {$row->produk->satuan} {$row->produk->sediaan}
-                    <div>
-                        <div><strong>Barcode / Batch :</strong> {$row->barcode} </div>
-                        <div><strong>ED:</strong>" . ($row->expired_date ?? '-') . "</div>
+                return "<strong>{$row->produk->name} {$row->produk->dosis} {$row->produk->satuan} {$row->produk->sediaan}</strong>
+                    <div class='row row-cols-2 text-muted'>
+                        <div class='col'>Barcode / Batch : {$row->barcode} </div>
+                        <div class='col'>ED : " . ($row->expired_date ?? '-') . "</div>
+                        <div class='col'>Jumlah : {$row->jumlah_kemasan} {$row->satuan_kemasan}</div>
+                        <div class='col'>Harga Beli : " . formatUang($row->harga_beli_kemasan) . "/{$row->satuan_kemasan}</div>
                     </div>
                 ";
             })
             // HARGA BELI (gabungan)
             ->addColumn('harga_beli_group', function ($row) {
-                return "
-                    <div>
-                        <div><strong>Kemasan:</strong> " . formatUang($row->harga_beli_kemasan, true) . "</div>
-                        <div><strong>Satuan:</strong> " . formatUang($row->harga_beli_satuan, true) . "</div>
-                    </div>
-                ";
+                return formatUang($row->harga_beli_satuan, true) . " / {$row->produk->sediaan}";
             })
 
             // QTY (gabungan)
             ->addColumn('qty_group', function ($row) {
-                return "
-                    <div>
-                        <div><strong>Kemasan:</strong> {$row->jumlah_kemasan} {$row->satuan_kemasan}</div>
-                        <div><strong>Stok:</strong> {$row->qty} {$row->produk->sediaan} </div>
-                    </div>
-                ";
+                return "{$row->qty} {$row->produk->sediaan}";
             })
 
             // HARGA JUAL (gabungan: HJ, Untung, Margin)
             ->addColumn('harga_jual_group', function ($row) {
                 return "
-                    <div>
-                        <div><strong>Harga Jual/Satuan:</strong> " . formatUang($row->harga_jual_satuan, true) . "</div>
-                        <div><strong>Keuntungan:</strong> " . formatUang($row->keuntungan_satuan, true) . "</div>
-                        <div><strong>Margin:</strong> {$row->margin}%</div>
+                    <div class='row row-cols-1'>
+                        <div class='d-flex justify-content-between'><strong>Resep : </strong> " . formatUang($row->harga_jual_resep, true) . "</div>
+                        <div class='d-flex justify-content-between'><strong>Bebas : </strong> " . formatUang($row->harga_jual_bebas, true) . "</div>
+                        <div class='d-flex justify-content-between'><strong>Apotek : </strong>" . formatUang($row->harga_jual_apotek, true) . "</div>
+                    </div>
+                ";
+            })
+
+            // HARGA JUAL (gabungan: HJ, Untung, Margin)
+            ->addColumn('keuntungan_group', function ($row) {
+                return "
+                    <div class='row row-cols-1'>
+                        <div class='d-flex justify-content-between'><strong>Resep : </strong> " . formatUang($row->harga_jual_resep - $row->harga_beli_satuan, true) . "</div>
+                        <div class='d-flex justify-content-between'><strong>Bebas : </strong> " . formatUang($row->harga_jual_bebas - $row->harga_beli_satuan, true) . "</div>
+                        <div class='d-flex justify-content-between'><strong>Apotek : </strong>" . formatUang($row->harga_jual_apotek - $row->harga_beli_satuan, true) . "</div>
                     </div>
                 ";
             })
@@ -77,6 +80,7 @@ class PembelianDetailController extends Controller
                 'harga_beli_group',
                 'qty_group',
                 'harga_jual_group',
+                'keuntungan_group',
                 'action',
             ])
 
@@ -103,9 +107,12 @@ class PembelianDetailController extends Controller
             'qty',
             'harga_beli_kemasan',
             'harga_beli_satuan',
-            'harga_jual_satuan',
-            'keuntungan_satuan',
-            'margin',
+            'harga_jual_resep',
+            'harga_jual_bebas',
+            'harga_jual_apotek',
+            'margin_resep',
+            'margin_bebas',
+            'margin_apotek',
             'total'
         ]));
 

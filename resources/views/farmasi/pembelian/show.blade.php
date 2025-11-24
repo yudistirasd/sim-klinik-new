@@ -34,28 +34,44 @@
         </div>
         <div class="card-body">
           <div class="row">
-            <div class="col-md-3 col-sm-12">
+            <div class="col-md-2 col-sm-12">
               <div class="mb-3">
                 <label class="form-label">No Pembelian</label>
                 <input type="text" disabled class="form-control" placeholder="Otomatis dari sistem" autocomplete="off" value="{{ $pembelian->nomor }}">
               </div>
             </div>
-            <div class="col-md-3 col-sm-12">
+            <div class="col-md-2 col-sm-12">
               <div class="mb-3">
                 <label class="form-label">Tanggal Pembelian</label>
                 <input type="text" disabled class="form-control" placeholder="Otomatis dari sistem" autocomplete="off" value="{{ $pembelian->tanggal }}">
               </div>
             </div>
-            <div class="col-md-3 col-sm-12">
+            <div class="col-md-2 col-sm-12">
               <div class="mb-3">
                 <label class="form-label">Suplier</label>
                 <input type="text" disabled class="form-control" placeholder="Otomatis dari sistem" autocomplete="off" value="{{ $pembelian->suplier->name }}">
               </div>
             </div>
-            <div class="col-md-3 col-sm-12">
+            <div class="col-md-2 col-sm-12">
+              <div class="mb-3">
+                <label class="form-label">No Faktur</label>
+                <input type="text" disabled class="form-control" placeholder="Otomatis dari sistem" autocomplete="off" value="{{ $pembelian->no_faktur }}">
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-12">
+              <div class="mb-3">
+                <label class="form-label">Tgl Faktur</label>
+                <input type="text" disabled class="form-control" placeholder="Otomatis dari sistem" autocomplete="off" value="{{ $pembelian->tgl_faktur }}">
+              </div>
+            </div>
+            <div class="col-md-2 col-sm-12">
               <div class="mb-3">
                 <label class="form-label">Ditambahkan Ke Stok</label>
-                <input type="text" disabled class="form-control text-uppercase" placeholder="Otomatis dari sistem" autocomplete="off" value="{{ $pembelian->insert_stok }}">
+                @php
+                  $status = $pembelian->insert_stok;
+                  $color = $status == 'belum' ? 'bg-orange text-orange-fg' : 'bg-green text-green-fg';
+                @endphp
+                <span class="badge {{ $color }} text-uppercase">{{ $status }}</span>
               </div>
             </div>
           </div>
@@ -148,29 +164,87 @@
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-md-2 col-sm-12">
-                  <div class="mb-3">
-                    <label class="form-label">Harga Jual per satuan</label>
-                    <input type="text" class="form-control form-control-sm" x-on:input="hitungKeuntungan()" id="harga_jual_satuan" autocomplete="off" :class="{ 'is-invalid': errors.harga_jual_satuan }">
-                    <div class="invalid-feedback" x-text="errors.harga_jual_satuan"></div>
+              <div class="row mb-5 mt-3">
+                <div class="col-md-4 col-sm-12">
+                  <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-primary-fg">
+                      <h3 class="card-title">Harga Resep</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="mb-3">
+                        <label class="form-label">Harga Jual - per satuan</label>
+                        <input type="text" class="form-control form-control-sm" x-on:input="hitungKeuntungan()" id="harga_jual_resep" autocomplete="off" :class="{ 'is-invalid': errors.harga_jual_resep }">
+                        <div class="invalid-feedback" x-text="errors.harga_jual_resep"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Keuntungan - per satuan</label>
+                        <input type="text" disabled class="form-control form-control-sm" x-model="keuntungan_resep_view" autocomplete="off" :class="{ 'is-invalid': errors.keuntungan_satuan }">
+                        <div class="invalid-feedback" x-text="errors.keuntungan_satuan"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Margin (%)</label>
+                        <input type="text" disabled class="form-control form-control-sm" x-model="form.margin_resep" autocomplete="off" :class="{ 'is-invalid': errors.margin_resep }">
+                        <div class="invalid-feedback" x-text="errors.margin_resep"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="col-md-2 col-sm-12">
-                  <div class="mb-3">
-                    <label class="form-label">Keuntungan per satuan</label>
-                    <input type="text" disabled class="form-control form-control-sm" x-model="keuntungan_satuan_view" autocomplete="off" :class="{ 'is-invalid': errors.keuntungan_satuan }">
-                    <div class="invalid-feedback" x-text="errors.keuntungan_satuan"></div>
+                <div class="col-md-4 col-sm-12">
+                  <div class="card shadow-lg">
+                    <div class="card-header bg-indigo text-indigo-fg">
+                      <h3 class="card-title">Harga Obat Bebas</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="mb-3">
+                        <label class="form-label">Harga Jual - per satuan</label>
+                        <input type="text" class="form-control form-control-sm" x-on:input="hitungKeuntungan()" id="harga_jual_bebas" autocomplete="off" :class="{ 'is-invalid': errors.harga_jual_bebas }">
+                        <div class="invalid-feedback" x-text="errors.harga_jual_resep"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Keuntungan - per satuan</label>
+                        <input type="text" disabled class="form-control form-control-sm" x-model="keuntungan_bebas_view" autocomplete="off" :class="{ 'is-invalid': errors.keuntungan_satuan }">
+                        <div class="invalid-feedback" x-text="errors.keuntungan_satuan"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Margin (%)</label>
+                        <input type="text" disabled class="form-control form-control-sm" x-model="form.margin_bebas" autocomplete="off" :class="{ 'is-invalid': errors.margin_bebas }">
+                        <div class="invalid-feedback" x-text="errors.margin_bebas"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="col-md-2 col-sm-12">
-                  <div class="mb-3">
-                    <label class="form-label">Margin (%)</label>
-                    <input type="text" disabled class="form-control form-control-sm" x-model="form.margin" autocomplete="off" :class="{ 'is-invalid': errors.margin }">
-                    <div class="invalid-feedback" x-text="errors.margin"></div>
+                <div class="col-md-4 col-sm-12">
+                  <div class="card shadow-lg">
+                    <div class="card-header bg-cyan text-cyan-fg">
+                      <h3 class="card-title">Harga Sesama Apotek</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="mb-3">
+                        <label class="form-label">Harga Jual - per satuan</label>
+                        <input type="text" class="form-control form-control-sm" x-on:input="hitungKeuntungan()" id="harga_jual_apotek" autocomplete="off" :class="{ 'is-invalid': errors.harga_jual_apotek }">
+                        <div class="invalid-feedback" x-text="errors.harga_jual_resep"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Keuntungan - per satuan</label>
+                        <input type="text" disabled class="form-control form-control-sm" x-model="keuntungan_apotek_view" autocomplete="off" :class="{ 'is-invalid': errors.keuntungan_satuan }">
+                        <div class="invalid-feedback" x-text="errors.keuntungan_satuan"></div>
+                      </div>
+
+                      <div class="mb-3">
+                        <label class="form-label">Margin (%)</label>
+                        <input type="text" disabled class="form-control form-control-sm" x-model="form.margin_apotek" autocomplete="off" :class="{ 'is-invalid': errors.margin_apotek }">
+                        <div class="invalid-feedback" x-text="errors.margin_apotek"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+
               <div class="mb-3 text-end">
                 <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
                   <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
@@ -188,6 +262,7 @@
                   <th class="text-center">Harga Beli</th>
                   <th class="text-center">Qty</th>
                   <th class="text-center">Harga Jual</th>
+                  <th class="text-center">Keuntungan</th>
                   <th class="text-center">Total</th>
                   <th class="text-center">Aksi</th>
                 </tr>
@@ -231,7 +306,7 @@
           orderable: false,
           searchable: false,
           sClass: 'text-center',
-          width: '5%'
+          width: '3%'
         },
         {
           data: 'produk.name',
@@ -242,21 +317,30 @@
         {
           data: 'harga_beli_group',
           name: 'harga_beli_group',
-          sClass: 'text-start',
+          sClass: 'text-end',
           orderable: false,
           searchable: false,
         },
         {
           data: 'qty_group',
           name: 'qty_group',
-          sClass: 'text-start',
+          sClass: 'text-end',
           orderable: false,
           searchable: false,
         },
         {
           data: 'harga_jual_group',
           name: 'harga_jual_group',
-          sClass: 'text-start',
+          sClass: 'text-end',
+          width: "10%",
+          orderable: false,
+          searchable: false,
+        },
+        {
+          data: 'keuntungan_group',
+          name: 'keuntungan_group',
+          sClass: 'text-end',
+          width: "10%",
           orderable: false,
           searchable: false,
         },
@@ -271,7 +355,7 @@
           data: 'action',
           name: 'action',
           sClass: 'text-center',
-          width: "10%"
+          width: "5%"
         },
       ]
     });
@@ -290,16 +374,23 @@
           qty: '',
           harga_beli_kemasan: '',
           harga_beli_satuan: '',
-          harga_jual_satuan: '',
-          keuntungan_satuan: '',
-          margin: '',
+          harga_jual_resep: '',
+          harga_jual_bebas: '',
+          harga_jual_apotek: '',
+          margin_resep: '',
+          margin_bebas: '',
+          margin_apotek: '',
         },
         sediaan: '',
         mask_harga_beli_kemasan: {},
-        mask_harga_jual_satuan: {},
+        mask_harga_jual_resep: {},
+        mask_harga_jual_bebas: {},
+        mask_harga_jual_apotek: {},
         harga_beli_satuan_view: '',
         qty_view: '',
-        keuntungan_satuan_view: '',
+        keuntungan_resep_view: '',
+        keuntungan_bebas_view: '',
+        keuntungan_apotek_view: '',
         endPoint: '',
         errors: {},
         loading: false,
@@ -429,7 +520,17 @@
             normalizeZeros: true
           });
 
-          this.mask_harga_jual_satuan = IMask(document.getElementById('harga_jual_satuan'), {
+          this.mask_harga_jual_resep = IMask(document.getElementById('harga_jual_resep'), {
+            mask: Number,
+            thousandsSeparator: ',',
+          });
+
+          this.mask_harga_jual_bebas = IMask(document.getElementById('harga_jual_bebas'), {
+            mask: Number,
+            thousandsSeparator: ',',
+          });
+
+          this.mask_harga_jual_apotek = IMask(document.getElementById('harga_jual_apotek'), {
             mask: Number,
             thousandsSeparator: ',',
           });
@@ -512,22 +613,47 @@
 
         hitungKeuntungan() {
           if (!this.form.harga_beli_kemasan) {
-            this.mask_harga_jual_satuan.value = '';
+            this.mask_harga_jual_resep.value = '';
             return Toast.fire({
               icon: 'warning',
               title: 'Harga beli kemasan tidak boleh kosong!'
             })
           }
 
-          this.form.harga_jual_satuan = Number(this.mask_harga_jual_satuan.unmaskedValue);
 
-          let keuntungan = this.form.harga_jual_satuan - this.form.harga_beli_satuan;
-          let margin = (this.form.harga_jual_satuan - this.form.harga_beli_satuan) / this.form.harga_beli_satuan * 100;
+          if (this.mask_harga_jual_resep.unmaskedValue) {
+            this.form.harga_jual_resep = Number(this.mask_harga_jual_resep.unmaskedValue);
 
-          this.form.keuntungan_satuan = keuntungan;
-          this.keuntungan_satuan_view = formatUang(keuntungan);
+            let keuntungan = this.form.harga_jual_resep - this.form.harga_beli_satuan;
+            let margin = (this.form.harga_jual_resep - this.form.harga_beli_satuan) / this.form.harga_beli_satuan * 100;
 
-          this.form.margin = round(margin, 0);
+            this.keuntungan_resep_view = formatUang(keuntungan);
+            this.form.margin_resep = round(margin, 0);
+
+          }
+
+
+          if (this.mask_harga_jual_bebas.unmaskedValue) {
+            this.form.harga_jual_bebas = Number(this.mask_harga_jual_bebas.unmaskedValue);
+
+            let keuntungan = this.form.harga_jual_bebas - this.form.harga_beli_satuan;
+            let margin = (this.form.harga_jual_bebas - this.form.harga_beli_satuan) / this.form.harga_beli_satuan * 100;
+
+            this.keuntungan_bebas_view = formatUang(keuntungan);
+            this.form.margin_bebas = round(margin, 0);
+
+          }
+
+          if (this.mask_harga_jual_apotek.unmaskedValue) {
+            this.form.harga_jual_apotek = Number(this.mask_harga_jual_apotek.unmaskedValue);
+
+            let keuntungan = this.form.harga_jual_apotek - this.form.harga_beli_satuan;
+            let margin = (this.form.harga_jual_apotek - this.form.harga_beli_satuan) / this.form.harga_beli_satuan * 100;
+
+            this.keuntungan_apotek_view = formatUang(keuntungan);
+            this.form.margin_apotek = round(margin, 0);
+
+          }
         },
 
         resetForm() {
@@ -542,21 +668,28 @@
             qty: '',
             harga_beli_kemasan: '',
             harga_beli_satuan: '',
-            harga_jual_satuan: '',
-            keuntungan_satuan: '',
-            margin: '',
+            harga_jual_resep: '',
+            harga_jual_bebas: '',
+            harga_jual_apotek: '',
+            margin_resep: '',
+            margin_bebas: '',
+            margin_apotek: '',
           };
 
           this.sediaan = '';
           this.harga_beli_satuan_view = '';
-          this.keuntungan_satuan_view = '';
+          this.keuntungan_resep_view = '';
+          this.keuntungan_bebas_view = '';
+          this.keuntungan_apotek_view = '';
           this.qty_view = '';
           this.errors = {};
 
           $('#obat').val(null).trigger('change');
           $('#satuan_kemasan').val(null).trigger('change');
           this.mask_harga_beli_kemasan.value = '';
-          this.mask_harga_jual_satuan.value = '';
+          this.mask_harga_jual_resep.value = '';
+          this.mask_harga_jual_bebas.value = '';
+          this.mask_harga_jual_apotek.value = '';
         }
       }))
     })

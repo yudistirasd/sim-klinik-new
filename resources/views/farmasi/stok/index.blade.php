@@ -19,13 +19,18 @@
         <table class="table table-bordered table-hover" id="stok-table">
           <thead>
             <tr>
-              <th class="text-center">#</th>
-              <th class="text-center">Obat</th>
-              <th class="text-center">Barcode / Batch</th>
-              <th class="text-center">Expired Date</th>
-              <th class="text-center">Harga Beli</th>
-              <th class="text-center">Harga Jual</th>
-              <th class="text-center">Ready</th>
+              <th rowspan="2" class="text-center">#</th>
+              <th rowspan="2" class="text-center">Obat</th>
+              <th rowspan="2" class="text-center">Barcode / Batch</th>
+              <th rowspan="2" class="text-center">Expired Date</th>
+              <th rowspan="2" class="text-center">Harga Beli</th>
+              <th colspan="3" class="text-center">Harga Jual</th>
+              <th rowspan="2" class="text-center">Ready</th>
+            </tr>
+            <tr>
+              <th class="text-center">Harga Jual Resep</th>
+              <th class="text-center">Harga Jual Bebas</th>
+              <th class="text-center">Harga Jual Apotek</th>
             </tr>
           </thead>
         </table>
@@ -85,8 +90,18 @@
           sClass: 'text-end'
         },
         {
-          data: 'harga_jual',
-          name: 'harga_jual',
+          data: 'harga_jual_resep',
+          name: 'harga_jual_resep',
+          sClass: 'text-end'
+        },
+        {
+          data: 'harga_jual_bebas',
+          name: 'harga_jual_bebas',
+          sClass: 'text-end'
+        },
+        {
+          data: 'harga_jual_apotek',
+          name: 'harga_jual_apotek',
           sClass: 'text-end'
         },
         {

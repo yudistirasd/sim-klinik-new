@@ -67,7 +67,7 @@ class PembelianController extends Controller
     {
         $request->merge(['created_by' => Auth::id()]);
 
-        $pembelian = Pembelian::create($request->only(['tanggal', 'suplier_id', 'created_by']));
+        $pembelian = Pembelian::create($request->only(['tanggal', 'suplier_id', 'created_by', 'tgl_faktur', 'no_faktur']));
 
         return $this->sendResponse(data: $pembelian, message: __('http-response.success.store', ['Attribute' => 'Pembelian']));
     }
@@ -82,7 +82,9 @@ class PembelianController extends Controller
             $detail = PembelianDetail::where('pembelian_id', $pembelian->id)->get();
 
             foreach ($detail as $item) {
-                $keuntungan = $item->harga_jual_satuan - $item->harga_beli_satuan;
+                $keuntunganResepBaru = $item->harga_jual_resep - $item->harga_beli_satuan;
+                $keuntunganBebasBaru = $item->harga_jual_bebas - $item->harga_beli_satuan;
+                $keuntunganApotekBaru = $item->harga_jual_apotek - $item->harga_beli_satuan;
 
                 $oldStok = ProdukStok::where('produk_id', $item->produk_id)
                     ->whereRaw('ready > 0')
@@ -92,15 +94,27 @@ class PembelianController extends Controller
                     foreach ($oldStok as  $stok) {
                         $data = [
                             'stok_id' => $stok->id,
-                            'harga_jual_lama' => $stok->harga_jual,
-                            'keuntungan_lama' => $stok->keuntungan,
-                            'harga_jual_baru' => $item->harga_jual_satuan,
-                            'keuntungan_baru' => $keuntungan,
+                            'harga_jual_resep_lama' => $stok->harga_jual_resep,
+                            'harga_jual_resep_baru' => $item->harga_jual_resep,
+                            'keuntungan_resep_lama' => $stok->harga_jual_resep - $stok->harga_beli_satuam,
+                            'keuntungan_resep_baru' => $keuntunganResepBaru,
+
+                            'harga_jual_bebas_lama' => $stok->harga_jual_bebas,
+                            'harga_jual_bebas_baru' => $item->harga_jual_bebas,
+                            'keuntungan_bebas_lama' => $stok->harga_jual_bebas - $stok->harga_beli_satuam,
+                            'keuntungan_bebas_baru' => $keuntunganBebasBaru,
+
+                            'harga_jual_apotek_lama' => $stok->harga_jual_apotek,
+                            'harga_jual_apotek_baru' => $item->harga_jual_apotek,
+                            'keuntungan_apotek_lama' => $stok->harga_jual_apotek - $stok->harga_beli_satuam,
+                            'keuntungan_apotek_baru' => $keuntunganApotekBaru,
+
                             'keterangan' => 'Update harga terakhir otomatis oleh sistem.'
                         ];
                         LogPerubahanHarga::create($data);
-                        $stok->harga_jual = $item->harga_jual_satuan;
-                        $stok->keuntungan = $item->harga_jual - $stok->harga_beli;
+                        $stok->harga_jual_resep = $item->harga_jual_resep;
+                        $stok->harga_jual_bebas = $item->harga_jual_bebas;
+                        $stok->harga_jual_apotek = $item->harga_jual_apotek;
                         $stok->harga_terakhir_id = $item->id;
                         $stok->save();
                     }
@@ -119,8 +133,9 @@ class PembelianController extends Controller
                     barcode,
                     expired_date,
                     harga_beli,
-                    harga_jual,
-                    keuntungan,
+                    harga_jual_resep,
+                    harga_jual_bebas,
+                    harga_jual_apotek,
                     masuk,
                     keluar,
                     ready,
@@ -137,8 +152,9 @@ class PembelianController extends Controller
                     a.barcode,
                     a.expired_date,
                     a.harga_beli_satuan as harga_beli,
-                    a.harga_jual_satuan as harga_jual,
-                    a.keuntungan_satuan as keuntungan,
+                    a.harga_jual_resep,
+                    a.harga_jual_bebas,
+                    a.harga_jual_apotek,
                     a.qty,
                     0,
                     a.qty,
@@ -177,19 +193,14 @@ class PembelianController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pembelian $pembelian)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function update(UpdatePembelianRequest $request, Pembelian $pembelian)
     {
-        //
+
+        Pembelian::find($pembelian->id)->update($request->only(['tanggal', 'suplier_id', 'tgl_faktur', 'no_faktur']));
+
+        return $this->sendResponse(data: $pembelian, message: __('http-response.success.update', ['Attribute' => 'Pembelian']));
     }
 
     /**
@@ -197,6 +208,8 @@ class PembelianController extends Controller
      */
     public function destroy(Pembelian $pembelian)
     {
-        //
+        $pembelian->delete();
+
+        return $this->sendResponse(message: __('http-response.success.delete', ['Attribute' => 'Pembelian']));
     }
 }

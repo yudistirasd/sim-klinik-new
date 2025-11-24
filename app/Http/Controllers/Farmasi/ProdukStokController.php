@@ -17,7 +17,9 @@ class ProdukStokController extends Controller
                 'expired_date',
                 'barcode',
                 'harga_beli',
-                'harga_jual',
+                'harga_jual_resep',
+                'harga_jual_bebas',
+                'harga_jual_apotek',
                 DB::raw('sum(ps.ready) as ready')
             ])
             ->groupBy([
@@ -26,7 +28,9 @@ class ProdukStokController extends Controller
                 'pr.satuan',
                 'pr.sediaan',
                 'harga_beli',
-                'harga_jual',
+                'harga_jual_resep',
+                'harga_jual_bebas',
+                'harga_jual_apotek',
                 'expired_date',
                 'barcode',
             ]);
@@ -36,7 +40,9 @@ class ProdukStokController extends Controller
                 $query->where('pr.name', 'ilike', $keyword . '%');
             })
             ->editColumn('harga_beli', fn($row) => formatUang($row->harga_beli, true))
-            ->editColumn('harga_jual', fn($row) => formatUang($row->harga_jual, true))
+            ->editColumn('harga_jual_resep', fn($row) => formatUang($row->harga_jual_resep, true))
+            ->editColumn('harga_jual_bebas', fn($row) => formatUang($row->harga_jual_bebas, true))
+            ->editColumn('harga_jual_apotek', fn($row) => formatUang($row->harga_jual_apotek, true))
             ->editColumn('expired_date', fn($row) => empty($row->expired_date) ? '-' : $row->expired_date)
             ->addIndexColumn()
             ->make(true);

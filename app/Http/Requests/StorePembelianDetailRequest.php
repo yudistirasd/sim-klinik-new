@@ -29,8 +29,12 @@ class StorePembelianDetailRequest extends FormRequest
             'qty' => 'required',
             'harga_beli_kemasan' => 'required',
             'harga_beli_satuan' => 'required',
-            'harga_jual_satuan' => 'required',
-            'keuntungan_satuan' => 'required',
+            'harga_jual_resep' => 'required',
+            'harga_jual_bebas' => 'required',
+            'harga_jual_apotek' => 'required',
+            'margin_resep' => 'required',
+            'margin_bebas' => 'required',
+            'margin_apotek' => 'required',
         ];
     }
 

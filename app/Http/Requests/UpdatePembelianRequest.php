@@ -11,7 +11,7 @@ class UpdatePembelianRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class UpdatePembelianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'tanggal' => 'required',
+            'suplier_id' => 'required',
+            'no_faktur' => 'required',
+            'tgl_faktur' => 'required'
         ];
     }
 }

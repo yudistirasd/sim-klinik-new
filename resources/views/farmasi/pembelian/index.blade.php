@@ -27,10 +27,12 @@
           <thead>
             <tr>
               <th class="text-center">#</th>
-              <th class="text-center">Nama</th>
-              <th class="text-center">Alamat</th>
-              <th class="text-center">Telp</th>
-              <th class="text-center">Status</th>
+              <th class="text-center">Nomor</th>
+              <th class="text-center">Tanggal</th>
+              <th class="text-center">Suplier</th>
+              <th class="text-center">No Faktur</th>
+              <th class="text-center">Tgl Faktur</th>
+              <th class="text-center">Ditambahkan Ke Stok</th>
               <th class="text-center">Aksi</th>
             </tr>
           </thead>
@@ -67,6 +69,16 @@
                 </select>
                 <div class="invalid-feedback" x-text="errors.suplier_id"></div>
               </div>
+              <div class="mb-3">
+                <label class="form-label required">No Faktur</label>
+                <input type="text" class="form-control" autocomplete="off" x-model="form.no_faktur" :class="{ 'is-invalid': errors.no_faktur }">
+                <div class="invalid-feedback" x-text="errors.no_faktur"></div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label required">Tanggal Faktur</label>
+                <input type="date" class="form-control" autocomplete="off" x-model="form.tgl_faktur" :class="{ 'is-invalid': errors.tgl_faktur }">
+                <div class="invalid-feedback" x-text="errors.tgl_faktur"></div>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Batal</button>
@@ -101,7 +113,7 @@
       ajax: route('api.farmasi.pembelian.dt'),
       order: [
         [
-          1, 'asc'
+          2, 'desc'
         ]
       ],
       columns: [{
@@ -128,6 +140,16 @@
           sClass: 'text-start'
         },
         {
+          data: 'no_faktur',
+          name: 'no_faktur',
+          sClass: 'text-center'
+        },
+        {
+          data: 'tgl_faktur',
+          name: 'tgl_faktur',
+          sClass: 'text-center'
+        },
+        {
           data: 'insert_stok',
           name: 'insert_stok',
           sClass: 'text-center'
@@ -149,8 +171,11 @@
           nomor: '',
           tanggal: '{{ date('Y-m-d') }}',
           suplier_id: '',
+          no_faktur: '',
+          tgl_faktur: '',
           created_by: ''
         },
+        actionForm: '',
         endPoint: '',
         errors: {},
         loading: false,
@@ -236,6 +261,8 @@
           this.resetForm();
           this.title = title;
 
+          this.actionForm = action;
+
           if (action == 'create') {
             delete this.form._method;
             this.endPoint = route('api.farmasi.pembelian.store')
@@ -246,6 +273,10 @@
               ...data,
               _method: 'PUT'
             };
+
+            let suplier = new Option(data.suplier.name, data.suplier.id, true, true);
+
+            $('#suplier_id').append(suplier).trigger('change');
 
             this.endPoint = route('api.farmasi.pembelian.update', data.id);
           }
@@ -276,9 +307,14 @@
               title: response.message
             });
 
-            setTimeout(() => {
-              window.location.href = route('farmasi.pembelian.show', response.data.id);
-            }, 500);
+            if (this.actionForm == 'edit') {
+              table.ajax.reload();
+            } else {
+              setTimeout(() => {
+                window.location.href = route('farmasi.pembelian.show', response.data.id);
+              }, 500);
+            }
+
           }).fail((error) => {
             if (error.status === 422) {
               this.errors = error.responseJSON.errors;
@@ -296,7 +332,9 @@
           this.form = {
             nomor: '',
             tanggal: '{{ date('Y-m-d') }}',
-            suplier_id: ''
+            suplier_id: '',
+            no_faktur: '',
+            tgl_faktur: ''
           };
           this.errors = {};
         }

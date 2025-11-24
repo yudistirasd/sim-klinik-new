@@ -23,14 +23,16 @@ class StorePembelianRequest extends FormRequest
     {
         return [
             'tanggal' => 'required',
-            'suplier_id' => 'required'
+            'suplier_id' => 'required',
+            'no_faktur' => 'required',
+            'tgl_faktur' => 'required'
         ];
     }
 
     public function attributes()
     {
         return [
-            'suplier_id' => 'suplier'
+            'suplier_id' => 'suplier',
         ];
     }
 }

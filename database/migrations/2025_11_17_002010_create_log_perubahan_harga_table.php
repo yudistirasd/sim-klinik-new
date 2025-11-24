@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('log_perubahan_harga', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->unsignedBigInteger('stok_id');
+            $table->uuid('stok_id');
             $table->decimal('harga_jual_lama', 16, 2);
             $table->decimal('harga_jual_baru', 16, 2);
             $table->decimal('keuntungan_lama', 16, 2);
