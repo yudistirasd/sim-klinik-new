@@ -125,3 +125,15 @@ if (! function_exists('tipeRacikan')) {
         return $tipeRacikan[$tipe];
     }
 }
+
+if (! function_exists('waktuPemberianObat')) {
+    function waktuPemberianObat(): Collection
+    {
+        return collect([
+            'Pagi',
+            'Siang',
+            'Sore',
+            'Malam'
+        ]);
+    }
+}

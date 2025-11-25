@@ -85,9 +85,10 @@
     </div>
     @routes()
     <!-- BEGIN GLOBAL MANDATORY SCRIPTS -->
+    <script src="{{ asset('libs/jquery/jquery-3.7.0.min.js') }}?{{ config('app.version') }}"></script>
+    <script src="{{ asset('libs/autosize/dist/autosize.min.js') }}?{{ config('app.version') }}"></script>
     <script src="{{ asset('js/tabler-theme.min.js') }}?{{ config('app.version') }}" defer></script>
     <script src="{{ asset('js/tabler.min.js') }}?{{ config('app.version') }}" defer></script>
-    <script src="{{ asset('libs/jquery/jquery-3.7.0.min.js') }}?{{ config('app.version') }}"></script>
     <!-- Popperjs -->
     <script src="{{ asset('libs/tempus-dominus/popper.min.js') }}?{{ config('app.version') }}" crossorigin="anonymous"></script>
     <!-- Tempus Dominus JavaScript -->

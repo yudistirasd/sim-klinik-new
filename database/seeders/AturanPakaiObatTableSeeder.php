@@ -14,27 +14,18 @@ class AturanPakaiObatTableSeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['name' => 'Sebelum Makan'],
-            ['name' => 'Sesudah Makan'],
-            ['name' => 'Saat Makan'],
-            ['name' => 'Obat Luar'],
-            ['name' => 'Tetes Mata'],
-            ['name' => 'Tetes Telinga'],
-            ['name' => 'Serahkan Dokter'],
-            ['name' => 'Masukan Alat / Hisap'],
-            ['name' => '2 Jam Sesudah Makan'],
-            ['name' => 'Pagi Sebelum Jam 6'],
-            ['name' => 'Obat Suntik'],
-            ['name' => 'Kunyah'],
-            ['name' => 'Sesudah Makan Obat Harus habis'],
-            ['name' => 'Pagi (Sesudah Makan)'],
-            ['name' => 'Siang (Sesudah Makan)'],
-            ['name' => 'Sore (Sesudah Makan)'],
-            ['name' => 'Malam (Sesudah Makan)'],
-            ['name' => 'Oleskan Tipis'],
-            ['name' => 'Pagi (Sebelum Makan)'],
-            ['name' => 'Sore (Sebelum Makan)'],
-            ['name' => 'Bila Perlu'],
+            ["name" => "Diminum"],
+            ["name" => "Dikunyah"],
+            ["name" => "Diteteskan"],
+            ["name" => "Dioleskan Tipis"],
+            ["name" => "Obat Luar"],
+            ["name" => "Tetes Mata"],
+            ["name" => "Tetes Telinga"],
+            ["name" => "Tetes Hidung"],
+            ["name" => "Disuntikkan"],
+            ["name" => "Dihirup / Hisap"],
+            ["name" => "Dimasukkan (Rektal)"],
+            ["name" => "Dimasukkan (Vaginal)"]
         ];
 
         foreach ($data as $value) {

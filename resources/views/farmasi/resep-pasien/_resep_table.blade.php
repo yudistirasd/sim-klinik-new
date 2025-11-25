@@ -132,7 +132,7 @@
           <div class="d-flex flex-wrap gap-3 text-muted">
             <span><i class="ti ti-user me-1"></i>{{ $resep->dokter->name }}</span>
             <span><i class="ti ti-calendar me-1"></i>{{ $resep->tanggal }}</span>
-            <span><i class="ti ti-pill me-1"></i>{{ $resep->items->count() }} Item</span>
+            <span><i class="ti ti-pill me-1"></i>{{ count($resep->items) }} Item</span>
           </div>
         </div>
         <div class="col-auto d-flex gap-2">
@@ -210,7 +210,7 @@
                 @endif
                 <td class="text-center">{{ $item->signa }}</td>
                 <td class="text-center">{{ $item->lama_hari ?? '-' }}</td>
-                <td class="text-uppercase">
+                <td class="text-uppercase text-end">
                   @if ($item->jenis_resep == 'non_racikan')
                     {{ $item->qty }} {{ $item->sediaan }}
                   @else
@@ -260,7 +260,7 @@
                 <td class="text-muted fst-italic">-</td>
                 <td>
                   @if ($resep->status == 'ORDER')
-                    <button type='button' class='btn btn-danger btn-icon' onclick="confirmDelete(`{{ route('api.pemeriksaan.destroy.resep-detail', ['resep' => $resep->id, 'receipt_number' => $item->receipt_number]) }}`, handleResepObat.bind(null, '{{ $resep->id }}'))">
+                    <button type='button' class='btn btn-danger btn-icon' onclick="confirmDelete(`{{ route('api.pemeriksaan.destroy.resep-detail', ['resep' => $resep->id, 'receipt_number' => $item->receipt_number]) }}`, resepObat.bind(null, '{{ $resep->id }}'))">
                       <i class='ti ti-trash'></i>
                     </button>
                   @endif

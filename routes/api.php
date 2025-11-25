@@ -57,6 +57,8 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
         Route::post('farmasi/aturan-pakai-obat', [FarmasiController::class, 'storeAturanPakai'])->name('farmasi.aturan-pakai.store');
         Route::get('farmasi/satuan-kemasan-obat', [FarmasiController::class, 'satuanKemasan'])->name('farmasi.satuan-kemasan.get');
         Route::post('farmasi/satuan-kemasan-obat', [FarmasiController::class, 'storeSatuanKemasan'])->name('farmasi.satuan-kemasan.store');
+        Route::get('farmasi/kondisi-pemberian-obat', [FarmasiController::class, 'kondisiPemberianObat'])->name('farmasi.kondisi-pemberian-obat.get');
+        Route::post('farmasi/kondisi-pemberian-obat', [FarmasiController::class, 'storeKondisiPemberianObat'])->name('farmasi.kondisi-pemberian-obat.store');
 
         Route::apiResources([
             'pengguna' => UserController::class,

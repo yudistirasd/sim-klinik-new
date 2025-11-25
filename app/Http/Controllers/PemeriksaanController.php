@@ -193,6 +193,7 @@ class PemeriksaanController extends Controller
             ->join('resep_detail as rd', 'rd.resep_id', '=', 'rs.id')
             ->join('produk as pr', 'pr.id', '=', 'rd.produk_id')
             ->join('aturan_pakai_obat as ap', 'ap.id', '=', 'rd.aturan_pakai_id')
+            ->leftJoin('kondisi_pemberian_obat as kpo', 'kpo.id', '=', 'rd.kondisi_pemberian_obat_id')
             ->select([
                 'rs.id as resep_id',
                 'rs.status',
@@ -213,10 +214,19 @@ class PemeriksaanController extends Controller
                 'rd.dosis_per_racikan',
                 'rd.dosis_per_satuan',
                 'rd.catatan',
+                'rd.waktu_pemberian_obat',
                 'ap.name as aturan_pakai',
+                'kpo.name as kondisi_pemberian'
             ])
             ->where('rs.kunjungan_id', $request->kunjungan_id)
-            ->get();
+            ->get()
+            ->map(function ($row) {
+                if (!empty($row->waktu_pemberian_obat)) {
+                    $row->waktu_pemberian_obat = implode(", ", json_decode($row->waktu_pemberian_obat));
+                }
+
+                return $row;
+            });
 
         $resep->map(function ($row) use ($details) {
             $row->tanggal = Carbon::parse($row->created_at)->translatedFormat('d F Y');
@@ -235,6 +245,8 @@ class PemeriksaanController extends Controller
                     'kemasan_racikan'     => $header->kemasan_racikan,
                     'signa'               => $header->signa,
                     'aturan_pakai'        => $header->aturan_pakai,
+                    'kondisi_pemberian' => $header->kondisi_pemberian,
+                    'waktu_pemberian_obat' => $header->waktu_pemberian_obat,
                     'catatan' => $header->catatan,
                     'obat' => "Racikan " . tipeRacikan($header->tipe_racikan),
                     'komposisi' => $details->where('receipt_number', $header->receipt_number)
@@ -409,8 +421,11 @@ class PemeriksaanController extends Controller
                     'lama_hari' => $request->lama_hari,
                     'qty' => $request->qty,
                     'aturan_pakai_id' => $request->aturan_pakai_id,
-                    'embalase' => $request->embalase,
-                    'jasa_resep' => $request->jasa_resep
+                    'embalase' => $request->embalase ?? null,
+                    'jasa_resep' => $request->jasa_resep ?? null,
+                    'catatan' => $request->catatan,
+                    'waktu_pemberian_obat' => $request->waktu_pemberian_obat,
+                    'kondisi_pemberian_obat_id' => $request->kondisi_pemberian_obat_id
                 ]);
             }
 
@@ -422,14 +437,6 @@ class PemeriksaanController extends Controller
 
                 foreach ($komposisiRacikan as $key => $komposisi) {
                     $komposisi = (object) $komposisi;
-                    $embalase = null;
-                    $jasaResep = null;
-
-                    // jasa resep & embalase untuk non racikan, disimpan di row pertama komposisi obat
-                    if ($key == 0) {
-                        $embalase = $request->embalase;
-                        $jasaResep = $request->jasa_resep;
-                    }
 
                     // hitung qty berdasarkan total_dosis_obat dan jumlah_racikan
                     if ($request->tipe_racikan == 'non_dtd') {
@@ -459,9 +466,11 @@ class PemeriksaanController extends Controller
                         'dosis_per_racikan' => $dosis_per_racikan,
                         'dosis_per_satuan' => $komposisi->dosis_per_satuan,
                         'qty' => $qty,
-                        'embalase' => $embalase,
-                        'jasa_resep' => $jasaResep,
-                        'catatan' => $request->catatan
+                        'embalase' => $request->embalase,
+                        'jasa_resep' => $request->jasa_resep,
+                        'catatan' => $request->catatan,
+                        'waktu_pemberian_obat' => $request->waktu_pemberian_obat,
+                        'kondisi_pemberian_obat_id' => $request->kondisi_pemberian_obat_id
                     ];
 
                     ResepDetail::create($data);

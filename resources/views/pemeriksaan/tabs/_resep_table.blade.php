@@ -147,11 +147,11 @@
               <tr>
                 <th class="ps-3" style="width:40px">#</th>
                 <th style="width:5%">Jenis Resep</th>
-                <th style="width: 40%">Nama Obat / Racikan</th>
+                <th style="width:30%">Nama Obat / Racikan</th>
                 <th style="width:7%">Signa</th>
                 <th style="width:5%">Hari</th>
                 <th style="width:15%">Jumlah</th>
-                <th style="">Aturan Pakai</th>
+                <th style="">Aturan & Cara Pakai</th>
                 <th>Keterangan</th>
                 <th>Aksi</th>
               </tr>
@@ -191,8 +191,8 @@
                       <small class="text-purple text-uppercase" style="color:#7c3aed"><i class="bi bi-box me-1"></i>{{ $item->jumlah_racikan }} {{ $item->kemasan_racikan }}</small>
                     </td>
                   @endif
-                  <td>{{ $item->signa }}</td>
-                  <td>{{ $item->lama_hari ?? '-' }}</td>
+                  <td class="text-center">{{ $item->signa }}</td>
+                  <td class="text-center">{{ $item->lama_hari ?? '-' }}</td>
                   <td class="text-uppercase">
                     @if ($item->jenis_resep == 'non_racikan')
                       {{ $item->qty }} {{ $item->sediaan }}
@@ -200,8 +200,12 @@
                       {{ $item->jumlah_racikan }} {{ $item->kemasan_racikan }}
                     @endif
                   </td>
-                  <td>{{ $item->aturan_pakai }}</td>
-                  <td class="text-muted fst-italic">-</td>
+                  <td>
+                    {{ $item->aturan_pakai }}<br>
+                    {{ $item->waktu_pemberian_obat }}<br>
+                    {{ $item->kondisi_pemberian }}
+                  </td>
+                  <td class="text-muted fst-italic">{{ $item->catatan ?? '-' }} </td>
                   <td>
                     @if ($row->status == 'ORDER')
                       <button type='button' class='btn btn-danger btn-icon' onclick="confirmDelete(`{{ route('api.pemeriksaan.destroy.resep-detail', ['resep' => $row->id, 'receipt_number' => $item->receipt_number]) }}`, resepObat)">

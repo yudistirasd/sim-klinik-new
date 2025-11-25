@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
 use App\Models\AturanPakaiObat;
+use App\Models\KondisiPemberianObat;
 use App\Models\SatuanDosisObat;
 use App\Models\SatuanKemasanObat;
 use App\Models\SediaanObat;
@@ -120,5 +121,27 @@ class FarmasiController extends Controller
         });
 
         return $this->sendResponse(message: __('http-response.success.store', ['Attribute' => 'Satuan Kemasan obat']));
+    }
+
+    public function kondisiPemberianObat(Request $request)
+    {
+        $data = KondisiPemberianObat::select([
+            'id',
+            'name as text'
+        ])
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->limit(30)
+            ->get();
+
+        return $this->sendResponse(data: $data);
+    }
+
+    public function storeKondisiPemberianObat(Request $request)
+    {
+        $takaran = DB::transaction(function () use ($request) {
+            return KondisiPemberianObat::updateOrCreate(['name' => Str::ucfirst($request->name)]);
+        });
+
+        return $this->sendResponse(message: __('http-response.success.store', ['Attribute' => 'Kondisi Pemberian Obat']), data: $takaran);
     }
 }

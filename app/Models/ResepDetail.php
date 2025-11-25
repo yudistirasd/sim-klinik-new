@@ -13,6 +13,10 @@ class ResepDetail extends Model
     protected $table = 'resep_detail';
     public $guarded = [];
 
+    protected $casts = [
+        'waktu_pemberian_obat' => 'array',
+    ];
+
     /**
      * Get the produk that owns the ResepDetail
      *

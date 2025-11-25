@@ -87,8 +87,10 @@ class StoreResepRequest extends FormRequest
             'dokter_id' => 'required',
             'pasien_id' => 'required',
             'kunjungan_id' => 'required',
-            'embalase' => 'required',
-            'jasa_resep' => 'required'
+            'embalase' => 'nullable',
+            'jasa_resep' => 'nullable',
+            'waktu_pemberian_obat' => 'required',
+            'catatan' => 'nullable'
         ];
 
         $ruleResep = $ruleSets[$this->getRuleGroupName()];
@@ -118,13 +120,14 @@ class StoreResepRequest extends FormRequest
             'produk_id' => 'obat',
             'qty' => 'jumlah obat',
             'takaran_id' => 'takaran',
-            'aturan_pakai_id' => 'aturan pakai',
+            'aturan_pakai_id' => 'cara pakai',
 
             'komposisi_racikan'                                => 'komposisi racikan',
             'komposisi_racikan.*.produk_id'                    => 'nama obat',
             'komposisi_racikan.*.dosis_per_satuan'             => 'dosis per satuan obat',
             'komposisi_racikan.*.dosis_per_racikan'            => 'dosis per racikan',
             'komposisi_racikan.*.total_dosis_obat'             => 'total dosis obat',
+            'catatan' => 'keterangan'
         ];
     }
 }
