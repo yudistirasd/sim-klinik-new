@@ -173,7 +173,7 @@
                   <div class="invalid-feedback" x-text="errors.signa"></div>
                 </div>
               </div>
-              <div class="col-md-1 col-sm-12" x-show="form.tipe_racikan != 'dtd'">
+              <div class="col-md-1 col-sm-12" x-show="form.tipe_racikan != 'dtd' || form.jenis_resep == 'non_racikan'">
                 <div class="mb-3">
                   <label class="form-label">Lama Hari</label>
                   <input type="number" min="1" class="form-control" x-on:input="hitungJumlahObat" autocomplete="off" x-model="form.lama_hari" :class="{ 'is-invalid': errors.lama_hari }">
@@ -188,7 +188,7 @@
                 </div>
                 <div class="invalid-feedback d-block" x-text="errors.jumlah_racikan"></div>
               </div>
-              <div class="col-md-3 col-sm-12" x-show="form.jenis_resep == 'non_racikan'">
+              <div class="col-md-2 col-sm-12" x-show="form.jenis_resep == 'non_racikan'">
                 <div class="mb-3">
                   <label class="form-label">Jumlah Obat</label>
                   <div class="input-group mb-2">
@@ -206,6 +206,22 @@
                     <option value=""></option>
                   </select>
                   <div class="invalid-feedback" x-text="errors.aturan_pakai_id"></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 col-sm-12" x-show="form.jenis_resep != ''">
+                <div class="d-flex flex-row gap-3">
+                  <div class="mb-3">
+                    <label class="form-label">Embalase</label>
+                    <input type="number" min="0" class="form-control" x-on:input="hitungJumlahObat" autocomplete="off" x-model="form.embalase" :class="{ 'is-invalid': errors.embalase }">
+                    <div class="invalid-feedback" x-text="errors.embalase"></div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Jasa Resep</label>
+                    <input type="number" min="0" class="form-control" x-on:input="hitungJumlahObat" autocomplete="off" x-model="form.jasa_resep" :class="{ 'is-invalid': errors.jasa_resep }">
+                    <div class="invalid-feedback" x-text="errors.jasa_resep"></div>
+                  </div>
                 </div>
               </div>
 
@@ -292,6 +308,39 @@
         </div>
       </div>
     </div>
+
+
+    <div class="modal modal-blur fade" id="modal-jasa-resep" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ubah Jasa Resep & Embalase</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form @submit.prevent="handleSubmitJasaResep" autocomplete="off">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label required">Embalase</label>
+                <input type="text" class="form-control" autocomplete="off" x-model="formJasa.embalase" :class="{ 'is-invalid': errors.embalase }">
+                <div class="invalid-feedback" x-text="errors.embalase"></div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label required">Jasa Resep</label>
+                <input type="text" class="form-control" autocomplete="off" x-model="formJasa.jasa_resep" :class="{ 'is-invalid': errors.jasa_resep }">
+                <div class="invalid-feedback" x-text="errors.jasa_resep"></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+                <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
+                Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 @endsection
 @push('js')
@@ -337,7 +386,13 @@
           tipe_racikan: '',
           kemasan_racikan: '',
           jumlah_racikan: 0,
+          embalase: 0,
+          jasa_resep: 0,
           komposisi_racikan: []
+        },
+        formJasa: {
+          jasa_resep: 0,
+          embalase: 0,
         },
         sediaan: '',
         satuan: '',
@@ -524,6 +579,8 @@
             tipe_racikan: '',
             kemasan_racikan: '',
             jumlah_racikan: 0,
+            embalase: 0,
+            jasa_resep: 0,
             komposisi_racikan: []
           };
           this.errors = {};
@@ -888,8 +945,68 @@
             'non_dtd': 'Non DTD'
           };
           return tipe[this.form.tipe_racikan] || '-';
-        }
+        },
 
+
+        modalControl(data) {
+          this.endPoint = route('api.farmasi.resep-pasien.jasa-resep', {
+            detail: data.detail_resep_id
+          });
+
+          this.formJasa.embalase = data.embalase;
+          this.formJasa.jasa_resep = data.resep_obat;
+
+          $('#modal-jasa-resep').modal('show');
+        },
+
+        handleSubmitJasaResep() {
+
+          this.loading = true;
+          this.errors = {};
+
+
+          $.ajax({
+            url: this.endPoint,
+            method: 'POST',
+            data: this.formJasa,
+            dataType: 'json',
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            complete: () => {
+              this.loading = false;
+            }
+          }).done((response) => {
+            Toast.fire({
+              icon: 'success',
+              title: response.message
+            });
+
+            this.formJasa.jasa_resep = 0;
+            this.formJasa.embalase = 0;
+
+            $('#modal-jasa-resep').modal('hide');
+
+
+            resepObat();
+
+          }).fail((error) => {
+            if (error.status === 422) {
+              this.errors = error.responseJSON.errors;
+
+              Toast.fire({
+                icon: 'error',
+                title: error.responseJSON.message
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan !',
+                text: error.responseJSON.message
+              });
+            }
+          })
+        },
       }))
     })
 
@@ -940,6 +1057,12 @@
           })
         }
       });
+    }
+
+    const handleModalJasaResep = (data) => {
+      console.log(data.detail_resep_id);
+      const alpineComponent = Alpine.$data(document.querySelector('[x-data="Resep"]'));
+      alpineComponent.modalControl(data);
     }
   </script>
 @endpush

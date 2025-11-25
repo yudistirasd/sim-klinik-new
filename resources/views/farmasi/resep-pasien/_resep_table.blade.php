@@ -119,7 +119,7 @@
         <div class="col" data-bs-toggle="collapse" data-bs-target="#resep1">
           <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
             <span class="resep-number"><i class="bi bi-file-earmark-medical me-1"></i>{{ $resep->nomor }}</span>
-            @if ($resep->status == 'verified')
+            @if ($resep->status == 'VERIFIED')
               <span class="badge badge-verified rounded-pill px-2 py-1">
                 <i class="ti ti-circle-check me-1"></i>Verified
               </span>
@@ -163,6 +163,8 @@
           <tbody>
             @php
               $total = 0;
+              $totalEmbalase = 0;
+              $totalJasaResep = 0;
             @endphp
             @foreach ($resep->items as $item)
               <tr>
@@ -175,7 +177,12 @@
                   @endif
                 </td>
                 @if ($item->jenis_resep == 'non_racikan')
-                  <td class="fw-medium">{{ $item->obat ?? '-' }}</td>
+                  <td class="fw-medium">{{ $item->obat }}
+                    <button type="button" class="btn d-flex flex-row gap-1 mt-3" onclick="handleModalJasaResep({{ json_encode($item) }})" style="cursor: pointer">
+                      <small class="fs-5 text-muted fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
+                      <small class="fs-5 text-muted fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
+                    </button>
+                  </td>
                 @else
                   <td>
                     <div class="fw-medium">{{ $item->obat }}</div>
@@ -195,6 +202,10 @@
                       @endforeach
                     </ul>
                     <small class="text-purple text-uppercase" style="color:#7c3aed"><i class="bi bi-box me-1"></i>{{ $item->jumlah_racikan }} {{ $item->kemasan_racikan }}</small>
+                    <button type="button" class="btn d-flex flex-row gap-1 mt-3" onclick="handleModalJasaResep({{ json_encode($item) }})" style="cursor: pointer">
+                      <small class="fs-5 text-muted fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
+                      <small class="fs-5 text-muted fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
+                    </button>
                   </td>
                 @endif
                 <td class="text-center">{{ $item->signa }}</td>
@@ -224,6 +235,10 @@
                   @endif
                 </td>
                 <td class="text-end">
+                  @php
+                    $totalEmbalase += $item->embalase;
+                    $totalJasaResep += $item->jasa_resep;
+                  @endphp
                   @if ($item->jenis_resep == 'non_racikan')
                     @php
                       $total += $item->total;
@@ -253,8 +268,20 @@
               </tr>
             @endforeach
             <tr>
-              <th colspan="7" class="text-end">Total</th>
+              <th colspan="7" class="text-end">Total Obat</th>
               <th class="text-end">{{ formatUang($total) }}</th>
+            </tr>
+            <tr>
+              <th colspan="7" class="text-end">Total Embalase</th>
+              <th class="text-end">{{ formatUang($totalEmbalase) }}</th>
+            </tr>
+            <tr>
+              <th colspan="7" class="text-end">Total Jasa Resep</th>
+              <th class="text-end">{{ formatUang($totalJasaResep) }}</th>
+            </tr>
+            <tr>
+              <th colspan="7" class="text-end">Total Tagihan</th>
+              <th class="text-end">{{ formatUang($total + $totalEmbalase + $totalJasaResep) }}</th>
             </tr>
           </tbody>
         </table>

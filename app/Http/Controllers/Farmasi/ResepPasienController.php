@@ -78,7 +78,7 @@ class ResepPasienController extends Controller
             WITH obat_stok AS (
                 SELECT
                     ps.produk_id,
-                    ps.harga_jual,
+                    ps.harga_jual_resep as harga_jual,
                     SUM ( ps.ready ) as qty_tersedia
                 FROM
                     produk_stok ps
@@ -86,7 +86,7 @@ class ResepPasienController extends Controller
                     produk_id IN ( SELECT produk_id FROM resep_detail WHERE resep_id = ? )
                 GROUP BY
                     ps.produk_id,
-                    ps.harga_jual
+                    ps.harga_jual_resep
             )
             select
                 rs.id as resep_id,
@@ -95,7 +95,7 @@ class ResepPasienController extends Controller
                 pr.name || ' ' || pr.dosis || ' ' || pr.satuan as obat,
                 pr.sediaan,
                 pr.satuan as satuan_dosis,
-                rd.id,
+                rd.id as detail_resep_id,
                 rd.signa,
                 rd.qty,
                 rd.lama_hari,
@@ -108,6 +108,8 @@ class ResepPasienController extends Controller
                 rd.dosis_per_racikan,
                 rd.dosis_per_satuan,
                 rd.catatan,
+                rd.embalase,
+                rd.jasa_resep,
                 ap.name as aturan_pakai,
                 os.qty_tersedia,
                 os.harga_jual,
@@ -133,6 +135,7 @@ class ResepPasienController extends Controller
 
             foreach ($headerRacikan as $header) {
                 $item = (object) [
+                    'detail_resep_id' => $header->detail_resep_id,
                     'jenis_resep'       => $header->jenis_resep,
                     'receipt_number'      => $header->receipt_number,
                     'tipe_racikan'        => $header->tipe_racikan,
@@ -141,6 +144,8 @@ class ResepPasienController extends Controller
                     'signa'               => $header->signa,
                     'aturan_pakai'        => $header->aturan_pakai,
                     'catatan' => $header->catatan,
+                    'embalase' => $header->embalase,
+                    'jasa_resep' => $header->jasa_resep,
                     'obat' => "Racikan " . tipeRacikan($header->tipe_racikan),
                     'komposisi' => $details->where('receipt_number', $header->receipt_number)
                         ->where('jenis_resep', 'racikan')
@@ -289,5 +294,14 @@ class ResepPasienController extends Controller
 
             return $this->sendError(message: $message, errors: $ex->getMessage(), traces: $ex->getTrace(), code: $code);
         }
+    }
+
+    public function jasaResep(ResepDetail $detail, Request $request)
+    {
+        $detail->embalase = $request->embalase;
+        $detail->jasa_resep = $request->jasa_resep;
+        $detail->save();
+
+        return $this->sendResponse(message: __('http-response.success.update', ['Attribute' => 'Jasa Resep & Embalase']));
     }
 }

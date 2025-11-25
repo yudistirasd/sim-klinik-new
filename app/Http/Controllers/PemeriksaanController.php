@@ -409,6 +409,8 @@ class PemeriksaanController extends Controller
                     'lama_hari' => $request->lama_hari,
                     'qty' => $request->qty,
                     'aturan_pakai_id' => $request->aturan_pakai_id,
+                    'embalase' => $request->embalase,
+                    'jasa_resep' => $request->jasa_resep
                 ]);
             }
 
@@ -418,8 +420,16 @@ class PemeriksaanController extends Controller
 
                 $komposisiRacikan = $request->komposisi_racikan;
 
-                foreach ($komposisiRacikan as $komposisi) {
+                foreach ($komposisiRacikan as $key => $komposisi) {
                     $komposisi = (object) $komposisi;
+                    $embalase = null;
+                    $jasaResep = null;
+
+                    // jasa resep & embalase untuk non racikan, disimpan di row pertama komposisi obat
+                    if ($key == 0) {
+                        $embalase = $request->embalase;
+                        $jasaResep = $request->jasa_resep;
+                    }
 
                     // hitung qty berdasarkan total_dosis_obat dan jumlah_racikan
                     if ($request->tipe_racikan == 'non_dtd') {
@@ -449,6 +459,8 @@ class PemeriksaanController extends Controller
                         'dosis_per_racikan' => $dosis_per_racikan,
                         'dosis_per_satuan' => $komposisi->dosis_per_satuan,
                         'qty' => $qty,
+                        'embalase' => $embalase,
+                        'jasa_resep' => $jasaResep,
                         'catatan' => $request->catatan
                     ];
 

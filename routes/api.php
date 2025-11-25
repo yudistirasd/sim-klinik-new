@@ -137,5 +137,6 @@ Route::group(['as' => 'api.', 'middleware' => ['web', 'auth']], function () {
         Route::get('resep-pasien/dt', [ResepPasienController::class, 'dt'])->name('resep-pasien.dt');
         Route::get('resep-pasien/{resep}/obat', [ResepPasienController::class, 'obat'])->name('resep-pasien.obat');
         Route::post('resep-pasien/{resep}/verifikasi', [ResepPasienController::class, 'verifikasi'])->name('resep-pasien.verifikasi');
+        Route::post('resep-pasien/save-jasa-resep/{detail}', [ResepPasienController::class, 'jasaResep'])->name('resep-pasien.jasa-resep');
     });
 });

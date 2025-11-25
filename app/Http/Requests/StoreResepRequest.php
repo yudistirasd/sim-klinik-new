@@ -87,6 +87,8 @@ class StoreResepRequest extends FormRequest
             'dokter_id' => 'required',
             'pasien_id' => 'required',
             'kunjungan_id' => 'required',
+            'embalase' => 'required',
+            'jasa_resep' => 'required'
         ];
 
         $ruleResep = $ruleSets[$this->getRuleGroupName()];
