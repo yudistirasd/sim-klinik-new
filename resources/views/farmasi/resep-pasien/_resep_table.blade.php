@@ -136,8 +136,11 @@
           </div>
         </div>
         <div class="col-auto d-flex gap-2">
-          <button class="btn btn-icon btn-outline-primary" onclick="event.stopPropagation()" x-show="resep.status == 'VERIFIED'"><i class="ti ti-printer"></i></button>
-          <button class="btn btn-icon btn-outline-dark" onclick="handleVerifikasiResep(event)"><i class="ti ti-credit-card"></i></button>
+          @if ($resep->status == 'VERIFIED')
+            <button class="btn btn-outline-primary" onclick="event.stopPropagation()"><i class="ti ti-printer me-1"></i> E-Ticket</button>
+          @else
+            <button class="btn btn-outline-dark" onclick="handleVerifikasiResep(event)"><i class="ti ti-credit-card me-1"></i> Verifikasi</button>
+          @endif
         </div>
       </div>
     </div>
@@ -256,8 +259,12 @@
                     </ul>
                   @endif
                 </td>
-                <td>{{ $item->aturan_pakai }}</td>
-                <td class="text-muted fst-italic">-</td>
+                <td>
+                  {{ $item->aturan_pakai }}<br>
+                  {{ $item->waktu_pemberian_obat }}<br>
+                  {{ $item->kondisi_pemberian }}
+                </td>
+                <td class="text-muted fst-italic">{{ $item->catatan ?? '-' }} </td>
                 <td>
                   @if ($resep->status == 'ORDER')
                     <button type='button' class='btn btn-danger btn-icon' onclick="confirmDelete(`{{ route('api.pemeriksaan.destroy.resep-detail', ['resep' => $resep->id, 'receipt_number' => $item->receipt_number]) }}`, resepObat.bind(null, '{{ $resep->id }}'))">

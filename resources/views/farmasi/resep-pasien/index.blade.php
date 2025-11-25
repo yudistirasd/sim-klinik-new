@@ -157,6 +157,9 @@
               });
           });
       },
+      order: [
+        [8, 'desc']
+      ],
       columns: [{
           data: 'DT_RowIndex',
           name: 'DT_RowIndex',

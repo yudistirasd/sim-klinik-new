@@ -21,7 +21,7 @@ class FarmasiController extends Controller
             'name as value',
             'name as text'
         ])
-            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "{$request->keyword}%"))
             ->limit(30)
             ->get();
 
@@ -41,7 +41,7 @@ class FarmasiController extends Controller
             'name as value',
             'name as text'
         ])
-            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "{$request->keyword}%"))
             ->limit(30)
             ->get();
 
@@ -63,7 +63,7 @@ class FarmasiController extends Controller
             'id',
             'name as text'
         ])
-            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "{$request->keyword}%"))
             ->limit(30)
             ->get();
 
@@ -85,7 +85,7 @@ class FarmasiController extends Controller
             'id',
             'name as text'
         ])
-            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "{$request->keyword}%"))
             ->limit(30)
             ->get();
 
@@ -107,7 +107,7 @@ class FarmasiController extends Controller
             'name as value',
             'name as text'
         ])
-            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "{$request->keyword}%"))
             ->limit(30)
             ->get();
 
@@ -129,7 +129,7 @@ class FarmasiController extends Controller
             'id',
             'name as text'
         ])
-            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "%{$request->keyword}%"))
+            ->when($request->filled('keyword'), fn($q) => $q->where('name', 'ilike', "{$request->keyword}%"))
             ->limit(30)
             ->get();
 

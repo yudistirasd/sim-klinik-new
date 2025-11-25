@@ -53,6 +53,24 @@ class ResepPasienController extends Controller
             ->filterColumn('alamat_lengkap', function ($query, $keyword) {
                 $query->where('alamat', 'ilike', '%' . $keyword . '%');
             })
+            ->filterColumn('norm', function ($query, $keyword) {
+                $query->where('ps.norm', 'ilike', '%' . $keyword . '%');
+            })
+            ->filterColumn('nama', function ($query, $keyword) {
+                $query->where('ps.nama', 'ilike', '%' . $keyword . '%');
+            })
+            ->filterColumn('ruangan', function ($query, $keyword) {
+                $query->where('ru.name', 'ilike', '%' . $keyword . '%');
+            })
+            ->filterColumn('dokter', function ($query, $keyword) {
+                $query->where('dokter.name', 'ilike', '%' . $keyword . '%');
+            })
+            ->filterColumn('nomor', function ($query, $keyword) {
+                $query->where('rs.nomor', 'ilike', '%' . $keyword . '%');
+            })
+            ->filterColumn('status', function ($query, $keyword) {
+                $query->where('rs.status', 'ilike', '%' . $keyword . '%');
+            })
             ->addIndexColumn()
             ->editColumn('status', function ($row) {
                 $color = $row->status == 'VERIFIED' ? 'green' : 'orange';
@@ -110,19 +128,28 @@ class ResepPasienController extends Controller
                 rd.catatan,
                 rd.embalase,
                 rd.jasa_resep,
+                rd.waktu_pemberian_obat,
                 ap.name as aturan_pakai,
                 os.qty_tersedia,
                 os.harga_jual,
-                rd.qty * os.harga_jual as total
+                rd.qty * os.harga_jual as total,
+                kpo.name as kondisi_pemberian
             from resep as rs
             inner join resep_detail as rd on rd.resep_id = rs.id
             inner join produk as pr on pr.id = rd.produk_id
             inner join aturan_pakai_obat as ap on ap.id = rd.aturan_pakai_id
             LEFT JOIN obat_stok as os ON os.produk_id = rd.produk_id
+            left join kondisi_pemberian_obat as kpo ON kpo.id = rd.kondisi_pemberian_obat_id
             where rs.id = ?
         ", [$resep->id, $resep->id]);
 
-        $details = collect($data);
+        $details = collect($data)->map(function ($row) {
+            if (!empty($row->waktu_pemberian_obat)) {
+                $row->waktu_pemberian_obat = implode(", ", json_decode($row->waktu_pemberian_obat));
+            }
+
+            return $row;
+        });
 
         $resep->tanggal = Carbon::parse($resep->created_at)->translatedFormat('d F Y');
 
@@ -135,6 +162,7 @@ class ResepPasienController extends Controller
 
             foreach ($headerRacikan as $header) {
                 $item = (object) [
+                    'resep_id' => $header->resep_id,
                     'detail_resep_id' => $header->detail_resep_id,
                     'jenis_resep'       => $header->jenis_resep,
                     'receipt_number'      => $header->receipt_number,
@@ -143,6 +171,8 @@ class ResepPasienController extends Controller
                     'kemasan_racikan'     => $header->kemasan_racikan,
                     'signa'               => $header->signa,
                     'aturan_pakai'        => $header->aturan_pakai,
+                    'kondisi_pemberian' => $header->kondisi_pemberian,
+                    'waktu_pemberian_obat' => $header->waktu_pemberian_obat,
                     'catatan' => $header->catatan,
                     'embalase' => $header->embalase,
                     'jasa_resep' => $header->jasa_resep,
@@ -196,6 +226,7 @@ class ResepPasienController extends Controller
 
     public function verifikasi(Resep $resep)
     {
+
         DB::beginTransaction();
 
         try {
@@ -210,7 +241,7 @@ class ResepPasienController extends Controller
                 $penjualan = Penjualan::create([
                     'resep_id' => $resep->id,
                     'kunjungan_id' => $resep->kunjungan_id,
-                    'jenis' => 'resep_in',
+                    'jenis' => 'resep',
                     'tanggal' => date('Y-m-d'),
                     'created_by' => Auth::id()
                 ]);
@@ -254,8 +285,8 @@ class ResepPasienController extends Controller
                         $dijual -= $terjual;
                     }
 
-                    $hargaJual = $stok->harga_jual;
-                    $total = $stok->harga_jual * $terjual;
+                    $hargaJual = $stok->harga_jual_resep;
+                    $total = $hargaJual * $terjual;
 
                     $detail = PenjualanDetail::create([
                         'penjualan_id' => $penjualan->id,
@@ -269,6 +300,7 @@ class ResepPasienController extends Controller
                         'keuntungan' => $hargaJual - $stok->harga_beli,
                         'qty' => $terjual,
                         'total' => $total,
+                        'harga_jual_tipe' => 'resep'
                     ]);
                 }
             }
@@ -296,11 +328,14 @@ class ResepPasienController extends Controller
         }
     }
 
-    public function jasaResep(ResepDetail $detail, Request $request)
+    public function jasaResep(Resep $resep, $receiptNumber, Request $request)
     {
-        $detail->embalase = $request->embalase;
-        $detail->jasa_resep = $request->jasa_resep;
-        $detail->save();
+        ResepDetail::where('resep_id', $resep->id)
+            ->where('receipt_number', $receiptNumber)
+            ->update([
+                'embalase' => $request->embalase,
+                'jasa_resep' => $request->jasa_resep
+            ]);
 
         return $this->sendResponse(message: __('http-response.success.update', ['Attribute' => 'Jasa Resep & Embalase']));
     }

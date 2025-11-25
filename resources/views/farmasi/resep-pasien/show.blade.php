@@ -165,15 +165,28 @@
                   <div class="invalid-feedback" x-text="errors.produk_id"></div>
                 </div>
               </div>
-
-              <div class="col-md-3 col-sm-12">
+              <div class="col-md-2 col-sm-12" x-show="form.jenis_resep">
+                <div class="form-label">Waktu Pemberian</div>
+                <div class="row row-cols-2">
+                  @foreach (waktuPemberianObat() as $item)
+                    <div class="col">
+                      <label class="form-check fs-5">
+                        <input class="form-check-input" x-on:change="hitungSigna" x-model="form.waktu_pemberian_obat" :class="{ 'is-invalid': errors.waktu_pemberian_obat }" type="checkbox" value="{{ $item }}">
+                        <span class="form-check-label fw-bolder">{{ $item }}</span>
+                      </label>
+                    </div>
+                  @endforeach
+                  <div class="invalid-feedback d-block" x-text="errors.waktu_pemberian_obat"></div>
+                </div>
+              </div>
+              <div class="col-md-1 col-sm-12" x-show="form.jenis_resep">
                 <div class="mb-3">
                   <label class="form-label">Signa</label>
-                  <input type="text" id="frekuensi" class="form-control text-sm" x-on:input="hitungJumlahObat" autocomplete="off" :class="{ 'is-invalid': errors.signa }">
+                  <input type="text" id="frekuensi" class="form-control p-2 text-center" x-on:input="hitungJumlahObat" autocomplete="off" :class="{ 'is-invalid': errors.signa }">
                   <div class="invalid-feedback" x-text="errors.signa"></div>
                 </div>
               </div>
-              <div class="col-md-1 col-sm-12" x-show="form.tipe_racikan != 'dtd' || form.jenis_resep == 'non_racikan'">
+              <div class="col-md-1 col-sm-12" x-show="form.jenis_resep && form.tipe_racikan != 'dtd'">
                 <div class="mb-3">
                   <label class="form-label">Lama Hari</label>
                   <input type="number" min="1" class="form-control" x-on:input="hitungJumlahObat" autocomplete="off" x-model="form.lama_hari" :class="{ 'is-invalid': errors.lama_hari }">
@@ -199,13 +212,30 @@
                 </div>
               </div>
 
-              <div class="col-md-3 col-sm-12">
+              <div class="col-md-3 col-sm-12" x-show="form.jenis_resep">
                 <div class="mb-3">
-                  <label class="form-label">Aturan Pakai</label>
+                  <label class="form-label">Cara Pakai</label>
                   <select class="form-control" id="aturan_pakai_id" :class="{ 'is-invalid': errors.aturan_pakai_id }" style="width: 100%">
                     <option value=""></option>
                   </select>
                   <div class="invalid-feedback" x-text="errors.aturan_pakai_id"></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 col-sm-12" x-show="form.jenis_resep">
+                <div class="mb-3">
+                  <label class="form-label">Kondisi Pemberian Obat</label>
+                  <select class="form-control" id="kondisi_pemberian_obat_id" :class="{ 'is-invalid': errors.kondisi_pemberian_obat_id }" style="width: 100%">
+                    <option value=""></option>
+                  </select>
+                  <div class="invalid-feedback" x-text="errors.kondisi_pemberian_obat_id"></div>
+                </div>
+              </div>
+
+              <div class="col-md-3 col-sm-12" x-show="form.jenis_resep">
+                <div class="mb-3">
+                  <label class="form-label">Keterangan : </label>
+                  <textarea class="form-control" data-bs-toggle="autosize" x-model="form.catatan" rows='1' placeholder="Type something…"></textarea>
                 </div>
               </div>
 
@@ -382,6 +412,9 @@
           qty: 0,
           takaran_id: '',
           aturan_pakai_id: '',
+          catatan: null,
+          kondisi_pemberian_obat_id: null,
+          waktu_pemberian_obat: [],
           jenis_resep: '',
           tipe_racikan: '',
           kemasan_racikan: '',
@@ -510,7 +543,29 @@
           }, 100);
         },
 
+        hitungSigna() {
+          let waktuPemberian = this.form.waktu_pemberian_obat.length
+          this.form.signa = `${waktuPemberian} X 1.0`;
+          this.form.frekuensi = waktuPemberian;
+          this.form.unit_dosis = 1;
+          this.mask.value = this.form.signa;
+        },
+
+
         handleSubmit() {
+          if (!this.form.jenis_resep) {
+            return Toast.fire({
+              icon: 'error',
+              title: 'Jenis resep tidak boleh kosong'
+            });
+          }
+
+          if (this.form.jenis_resep == 'racikan' && !this.form.tipe_racikan) {
+            return Toast.fire({
+              icon: 'error',
+              title: 'Tipe racikan tidak boleh kosong'
+            });
+          }
 
           this.loading = true;
           this.errors = {};
@@ -572,15 +627,16 @@
             unit_dosis: '',
             frekuensi: '',
             lama_hari: '',
+            catatan: null,
             qty: 0,
             takaran_id: '',
             aturan_pakai_id: '',
-            jenis_resep: '',
-            tipe_racikan: '',
+            kondisi_pemberian_obat_id: null,
+            waktu_pemberian_obat: [],
+            jenis_resep: null,
+            tipe_racikan: null,
             kemasan_racikan: '',
             jumlah_racikan: 0,
-            embalase: 0,
-            jasa_resep: 0,
             komposisi_racikan: []
           };
           this.errors = {};
@@ -643,87 +699,13 @@
             this.satuan = item?.satuan;
             this.dosis = item?.dosis;
             this.form.produk_id = value;
-          }).on('select2:select', () => {
-            $('#frekuensi').focus();
-          })
-
-          let searchResultsTakaran = [];
-          let selectTakaran = $('#takaran_id').select2({
-            theme: 'bootstrap-5',
-            placeholder: "Pilih Takaran",
-            searchInputPlaceholder: 'Cari Takaran',
-            allowClear: true,
-            tags: true,
-            ajax: {
-              url: route('api.master.farmasi.takaran.get'),
-              data: function(params) {
-                var query = {
-                  keyword: params.term,
-                }
-                return query;
-              },
-              processResults: function(response) {
-                searchResultsTakaran = response.data;
-                return {
-                  results: response.data
-                }
-              }
-            },
-            createTag: function(params) {
-              var term = $.trim(params.term);
-
-              if (term === '') {
-                return null;
-              }
-
-              if (searchResultsTakaran.length > 0) {
-                return null;
-              }
-
-              return {
-                id: term,
-                text: term,
-                newTag: true // add additional parameters
-              }
-            },
-          }).on('change', (e) => {
-            let value = e.target.value;
-            this.form.takaran_id = value;
-          }).off('select2:select').on('select2:select', (e) => {
-            // handle new option
-            if (e.params.data.newTag) {
-              $.ajax({
-                url: route('api.master.farmasi.takaran.store'),
-                method: 'POST',
-                data: {
-                  name: e.params.data.text
-                },
-                dataType: 'json'
-              }).done((response) => {
-                // ✅ Update option dengan ID dari backend
-                const newId = response.data.id; // misal backend return {data: {id: 123, name: "mg"}}
-
-                // Update option yang baru dibuat dengan ID asli
-                const $option = $('#takaran_id option[value="' + e.params.data.text + '"]');
-                $option.val(newId); // Ganti value dari text ke ID
-
-                // Update form value juga
-                this.form.takaran_id = newId;
-
-                // Trigger change agar select2 update
-                $('#takaran_id').val(newId).trigger('change');
-              })
-            }
-
-            $('#aturan_pakai_id').select2('open');
-
           })
 
           let searchResultsAturanPakai = [];
           let selectAturanPakai = $('#aturan_pakai_id').select2({
             theme: 'bootstrap-5',
-            placeholder: "Pilih Aturan Pakai",
-            searchInputPlaceholder: 'Cari Aturan Pakai',
+            placeholder: "Pilih Cara Pakai",
+            searchInputPlaceholder: 'Cari Cara Pakai',
             allowClear: true,
             tags: true,
             ajax: {
@@ -786,6 +768,78 @@
 
                 // Trigger change agar select2 update
                 $('#aturan_pakai_id').val(newId).trigger('change');
+              })
+            }
+
+            $('#kondisi_pemberian_obat_id').select2('open');
+
+          })
+
+          let searchResultsKondisiPemberianObat = [];
+          let selectKondisiPemberianObat = $('#kondisi_pemberian_obat_id').select2({
+            theme: 'bootstrap-5',
+            placeholder: "Pilih Kondisi Pemberian Obat",
+            searchInputPlaceholder: 'Cari Kondisi Pemberian Obat',
+            allowClear: true,
+            tags: true,
+            ajax: {
+              url: route('api.master.farmasi.kondisi-pemberian-obat.get'),
+              data: function(params) {
+                var query = {
+                  keyword: params.term,
+                }
+                return query;
+              },
+              processResults: function(response) {
+                searchResultsKondisiPemberianObat = response.data;
+                return {
+                  results: response.data
+                }
+              }
+            },
+            createTag: function(params) {
+              var term = $.trim(params.term);
+
+              if (term === '') {
+                return null;
+              }
+
+              if (searchResultsKondisiPemberianObat.length > 0) {
+                return null;
+              }
+
+              return {
+                id: term,
+                text: term,
+                newTag: true // add additional parameters
+              }
+            },
+          }).on('change', (e) => {
+            let value = e.target.value;
+            this.form.kondisi_pemberian_obat_id = value;
+          }).off('select2:select').on('select2:select', (e) => {
+            // handle new option
+            if (e.params.data.newTag) {
+              $.ajax({
+                url: route('api.master.farmasi.kondisi-pemberian-obat.store'),
+                method: 'POST',
+                data: {
+                  name: e.params.data.text
+                },
+                dataType: 'json'
+              }).done((response) => {
+                // ✅ Update option dengan ID dari backend
+                const newId = response.data.id; // misal backend return {data: {id: 123, name: "mg"}}
+
+                // Update option yang baru dibuat dengan ID asli
+                const $option = $('#kondisi_pemberian_obat_id option[value="' + e.params.data.text + '"]');
+                $option.val(newId); // Ganti value dari text ke ID
+
+                // Update form value juga
+                this.form.kondisi_pemberian_obat_id = newId;
+
+                // Trigger change agar select2 update
+                $('#kondisi_pemberian_obat_id').val(newId).trigger('change');
               })
             }
           })
@@ -950,11 +1004,12 @@
 
         modalControl(data) {
           this.endPoint = route('api.farmasi.resep-pasien.jasa-resep', {
-            detail: data.detail_resep_id
+            resep: data.resep_id,
+            receipt_number: data.receipt_number
           });
 
           this.formJasa.embalase = data.embalase;
-          this.formJasa.jasa_resep = data.resep_obat;
+          this.formJasa.jasa_resep = data.jasa_resep;
 
           $('#modal-jasa-resep').modal('show');
         },

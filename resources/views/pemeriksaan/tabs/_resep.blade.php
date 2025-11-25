@@ -543,8 +543,6 @@
             this.satuan = item?.satuan;
             this.dosis = item?.dosis;
             this.form.produk_id = value;
-          }).on('select2:select', () => {
-            $('#frekuensi').focus();
           })
 
           let searchResultsAturanPakai = [];

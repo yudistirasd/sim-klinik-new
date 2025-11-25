@@ -146,13 +146,13 @@
             <thead>
               <tr>
                 <th class="ps-3" style="width:40px">#</th>
-                <th style="width:5%">Jenis Resep</th>
-                <th style="width:30%">Nama Obat / Racikan</th>
-                <th style="width:7%">Signa</th>
-                <th style="width:5%">Hari</th>
-                <th style="width:15%">Jumlah</th>
-                <th style="">Aturan & Cara Pakai</th>
-                <th>Keterangan</th>
+                <th class="text-center" style="width:5%">Jenis Resep</th>
+                <th class="text-center" style="width:20%">Nama Obat / Racikan</th>
+                <th class="text-center">Signa</th>
+                <th class="text-center">Hari</th>
+                <th class="text-center">Jumlah</th>
+                <th class="text-center">Aturan & Cara Pakai</th>
+                <th class="text-center">Keterangan</th>
                 <th>Aksi</th>
               </tr>
             </thead>
