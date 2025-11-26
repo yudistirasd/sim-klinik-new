@@ -21,35 +21,29 @@
   <!-- Table -->
   <div class="card">
     <div class="card-body">
+      <div class="badges-list mb-3">
+        <span>Keterangan : </span>
+        <span class="badge bg-blue text-blue-fg">Resep Internal</span>
+        <span class="badge bg-dark text-dark-fg">Resep Luar</span>
+      </div>
       <div class="table-responsive">
-        <table class="table dataTable table-striped table-sm table-hover" id="pasien-table">
+        <table class="table dataTable table-bordered table-hover" id="pasien-table">
           <thead>
             <tr>
-              <th class="text-center">#</th>
-              <th class="text-center">Tanggal Registrasi</th>
-              <th class="text-center">No RM</th>
-              <th class="text-center">No Registrasi</th>
-              <th class="text-center">Nama Pasien</th>
-              <th class="text-center">Alamat</th>
-              <th class="text-center">Ruangan / Klinik</th>
-              <th class="text-center">Dokter</th>
-              <th class="text-center">No Resep</th>
-              <th class="text-center">Status</th>
-              <th class="text-center">Aksi</th>
+              <th class="text-center text-wrap">#</th>
+              <th class="text-center text-wrap">Tgl Resep</th>
+              <th class="text-center text-wrap">No Resep</th>
+              <th class="text-center text-wrap">Dokter</th>
+              <th class="text-center text-wrap">No RM</th>
+              <th class="text-center text-wrap">Nama Pasien</th>
+              <th class="text-center text-wrap">Alamat Pasien</th>
+              <th class="text-center text-wrap">Jenis Kelamin</th>
+              <th class="text-center text-wrap">Usia</th>
+              <th class="text-center text-wrap">Status Resep</th>
+              <th class="text-center text-wrap">Tagihan Resep</th>
+              <th class="text-center text-wrap">Status Pembayaran</th>
+              <th class="text-center text-wrap">Aksi</th>
             </tr>
-            {{-- <tr class="filter-row">
-              <th></th>
-              <th><input type="date" class="form-control form-control-sm" value="{{ date('Y-m-d') }}"></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th></th>
-              <th><input type="text" class="form-control form-control-sm" placeholder="Cari"></th>
-              <th></th>
-            </tr> --}}
           </thead>
         </table>
       </div>
@@ -158,7 +152,7 @@
           });
       },
       order: [
-        [8, 'desc']
+        [1, 'desc']
       ],
       columns: [{
           data: 'DT_RowIndex',
@@ -166,21 +160,28 @@
           orderable: false,
           searchable: false,
           sClass: 'text-center',
-          width: '5%'
+          width: '2%'
         },
         {
-          data: 'tanggal_registrasi',
-          name: 'tanggal_registrasi',
+          data: 'tanggal',
+          name: 'tanggal',
           sClass: 'text-center'
+        },
+        {
+          data: 'nomor',
+          name: 'nomor',
+          sClass: 'text-center'
+        },
+        {
+          data: 'dokter',
+          name: 'dokter',
+          sClass: 'text-start',
+          searchable: true,
+          orderable: false
         },
         {
           data: 'norm',
           name: 'norm',
-          sClass: 'text-center'
-        },
-        {
-          data: 'noregistrasi',
-          name: 'noregistrasi',
           sClass: 'text-center'
         },
         {
@@ -189,25 +190,19 @@
           sClass: 'text-start'
         },
         {
-          data: 'alamat_lengkap',
-          name: 'alamat_lengkap',
-          sClass: 'text-start',
-          searchable: true,
-          orderable: false
-        },
-        {
-          data: 'ruangan',
-          name: 'ruangan',
-          sClass: 'text-center'
-        },
-        {
-          data: 'dokter',
-          name: 'dokter',
+          data: 'alamat',
+          name: 'alamat',
           sClass: 'text-start'
         },
         {
-          data: 'nomor',
-          name: 'nomor',
+          data: 'jenis_kelamin',
+          name: 'jenis_kelamin',
+          sClass: 'text-center',
+          width: "5%"
+        },
+        {
+          data: 'usia',
+          name: 'usia',
           sClass: 'text-center'
         },
         {
@@ -216,10 +211,22 @@
           sClass: 'text-center'
         },
         {
+          data: 'total_akhir',
+          name: 'total_akhir',
+          sClass: 'text-end',
+          width: "10%"
+        },
+        {
+          data: 'status_bayar',
+          name: 'status_bayar',
+          sClass: 'text-center',
+          width: "5%"
+        },
+        {
           data: 'action',
           name: 'action',
           sClass: 'text-center',
-          width: "10%"
+          width: "5%"
         },
       ]
     });

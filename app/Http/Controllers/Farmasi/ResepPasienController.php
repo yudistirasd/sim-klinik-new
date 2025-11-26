@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Intervention\Image\Colors\Rgb\Channels\Red;
 use Str;
 
 class ResepPasienController extends Controller
@@ -23,55 +24,133 @@ class ResepPasienController extends Controller
     public function dt()
     {
 
-        $data = DB::table('kunjungan as kj')
-            ->join('pasien as ps', 'ps.id', '=', 'kj.pasien_id')
-            ->join('users as dokter', 'dokter.id', '=', 'kj.dokter_id')
-            ->join('ruangan as ru', 'ru.id', '=', 'kj.ruangan_id')
-            ->join('provinsi as prov', 'prov.id', '=', 'ps.provinsi_id')
-            ->join('kabupaten as kab', 'kab.id', '=', 'ps.kabupaten_id')
-            ->join('kelurahan as kel', 'kel.id', '=', 'ps.kelurahan_id')
-            ->join('kecamatan as kec', 'kec.id', '=', 'ps.kecamatan_id')
-            ->join('resep as rs', 'rs.kunjungan_id', '=', 'kj.id')
+        $embalaseDanJasaResep = "
+            SELECT
+                rd.resep_id,
+                COALESCE(rd.embalase, 0) AS embalase,
+                COALESCE(rd.jasa_resep, 0) AS jasa_resep,
+                ROW_NUMBER() OVER(
+                    PARTITION BY rd.resep_id, rd.receipt_number
+                ) AS rn
+            FROM resep_detail rd
+            INNER JOIN resep_pasien rp ON rp.id = rd.resep_id
+        ";
+
+        $data = DB::table('resep_pasien as rsp')
+            ->withExpression(
+                'resep_pasien',
+                DB::table('resep as rs')
+                    ->select(
+                        'rs.*',
+                        'rs.id as resep_id',
+                        'dokter.name as dokter',
+                        'kj.noregistrasi',
+                        'kj.tanggal_registrasi',
+                        'ru.name as ruangan',
+                        'ps.norm',
+                        'ps.id as pasien_id',
+                        'ps.nama',
+                        'ps.alamat',
+                        'ps.tanggal_lahir',
+                        'ps.jenis_kelamin'
+                    )
+                    ->join('users as dokter', 'dokter.id', '=', 'rs.dokter_id')
+                    ->join('pasien as ps', 'ps.id', '=', 'rs.pasien_id')
+                    ->leftJoin('kunjungan as kj', 'kj.id', '=', 'rs.kunjungan_id')
+                    ->leftJoin('ruangan as ru', 'ru.id', '=', 'kj.ruangan_id')
+            )->withExpression(
+                'obat_stok',
+                DB::table('produk_stok as ps')
+                    ->select(
+                        'ps.produk_id',
+                        'ps.harga_jual_resep as harga_jual',
+                        DB::raw('SUM(ps.ready) as qty_tersedia')
+                    )
+                    ->join('resep_detail as rd', 'rd.produk_id', '=', 'ps.produk_id')
+                    ->join('resep_pasien as rp', 'rp.id', '=', 'rd.resep_id')
+                    ->groupBy('ps.produk_id', 'ps.harga_jual_resep')
+            )
+            ->withExpression(
+                'biaya_obat',
+                DB::table('resep_pasien as rsp')
+                    ->select([
+                        'rsp.nomor',
+                        'rsp.id as resep_id',
+                        DB::raw("
+                                    COALESCE(
+                                        SUM(
+                                            CASE
+                                                WHEN rsp.status = 'ORDER'
+                                                    THEN rd.qty * os.harga_jual
+                                                    ELSE rd.qty * pjd.harga_jual
+                                            END
+                                        ),
+                                    0) AS total
+                        ")
+                    ])
+                    ->join('resep_detail as rd', 'rd.resep_id', '=', 'rsp.id')
+                    ->leftJoin('obat_stok as os', 'os.produk_id', '=', 'rd.produk_id')
+                    ->leftJoin('penjualan_detail as pjd', function ($join) {
+                        $join->on('pjd.resep_id', '=', 'rsp.id')
+                            ->on('pjd.resep_detail_id', '=', 'rd.id');
+                    })
+                    ->groupBy('rsp.id', 'rsp.nomor')
+            )->withExpression(
+                'embalase_and_jasa_resep',
+                DB::table(DB::raw("($embalaseDanJasaResep) as e"))
+                    ->select(
+                        'e.resep_id',
+                        DB::raw('SUM(e.jasa_resep) AS jasa_resep'),
+                        DB::raw('SUM(e.embalase) AS embalase')
+                    )
+                    ->where('e.rn', 1)
+                    ->groupBy('e.resep_id')
+            )
+            ->leftJoin('biaya_obat as bo', 'bo.resep_id', '=', 'rsp.id')
+            ->leftJoin('embalase_and_jasa_resep as ejr', 'ejr.resep_id', '=', 'rsp.id')
+            ->leftJoin('penjualan as pj', 'pj.resep_id', '=', 'rsp.id')
             ->select([
-                'kj.id',
-                'kj.pasien_id',
-                'kj.noregistrasi',
-                DB::raw('kj.tanggal_registrasi::date tanggal_registrasi'),
-                'kj.status_bayar',
-                'kj.tanggal_bayar',
-                'ru.name as ruangan',
-                'ps.nama',
-                'ps.norm',
-                DB::raw("alamat || ', ' || kel.name || ', ' || kec.name  as alamat_lengkap"),
-                'dokter.name as dokter',
-                'rs.id as resep_id',
-                'rs.nomor',
-                'rs.status'
+                'rsp.*',
+                'bo.total',
+                'ejr.embalase',
+                'ejr.jasa_resep',
+                DB::raw("coalesce(pj.status, 'belum') as status_pembayaran"),
+                DB::raw("coalesce(total + jasa_resep + embalase, 0) as total_akhir")
             ]);
 
         return DataTables::of($data)
-            ->filterColumn('alamat_lengkap', function ($query, $keyword) {
-                $query->where('alamat', 'ilike', '%' . $keyword . '%');
-            })
-            ->filterColumn('norm', function ($query, $keyword) {
-                $query->where('ps.norm', 'ilike', '%' . $keyword . '%');
-            })
-            ->filterColumn('nama', function ($query, $keyword) {
-                $query->where('ps.nama', 'ilike', '%' . $keyword . '%');
-            })
-            ->filterColumn('ruangan', function ($query, $keyword) {
-                $query->where('ru.name', 'ilike', '%' . $keyword . '%');
-            })
-            ->filterColumn('dokter', function ($query, $keyword) {
-                $query->where('dokter.name', 'ilike', '%' . $keyword . '%');
-            })
-            ->filterColumn('nomor', function ($query, $keyword) {
-                $query->where('rs.nomor', 'ilike', '%' . $keyword . '%');
-            })
-            ->filterColumn('status', function ($query, $keyword) {
-                $query->where('rs.status', 'ilike', '%' . $keyword . '%');
-            })
+            // ->filterColumn('alamat_lengkap', function ($query, $keyword) {
+            //     $query->where('alamat', 'ilike', '%' . $keyword . '%');
+            // })
+            // ->filterColumn('norm', function ($query, $keyword) {
+            //     $query->where('ps.norm', 'ilike', '%' . $keyword . '%');
+            // })
+            // ->filterColumn('nama', function ($query, $keyword) {
+            //     $query->where('ps.nama', 'ilike', '%' . $keyword . '%');
+            // })
+            // ->filterColumn('ruangan', function ($query, $keyword) {
+            //     $query->where('ru.name', 'ilike', '%' . $keyword . '%');
+            // })
+            // ->filterColumn('dokter', function ($query, $keyword) {
+            //     $query->where('dokter.name', 'ilike', '%' . $keyword . '%');
+            // })
+            // ->filterColumn('nomor', function ($query, $keyword) {
+            //     $query->where('rs.nomor', 'ilike', '%' . $keyword . '%');
+            // })
+            // ->filterColumn('status', function ($query, $keyword) {
+            //     $query->where('rs.status', 'ilike', '%' . $keyword . '%');
+            // })
             ->addIndexColumn()
+            ->editColumn('nomor', function ($row) {
+                $color = $row->asal_resep == 'IN' ? 'bg-blue text-blue-fg' : 'bg-dark text-dark-fg';
+                return "<span class='badge {$color}'>{$row->nomor}</span>";
+            })
+            ->addColumn('usia', fn($row) => hitungUsiaPasien($row->tanggal_lahir, $row->tanggal_registrasi ?? null))
+            ->editColumn('total_akhir', fn($row) => formatUang($row->total_akhir))
+            ->editColumn('status_bayar', function ($row) {
+                $color = $row->status_pembayaran == 'lunas' ? 'bg-green text-green-fg' : 'bg-yellow text-yellow-fg';
+                return "<span class='badge {$color} text-uppercase'>{$row->status_pembayaran}</span>";
+            })
             ->editColumn('status', function ($row) {
                 $color = $row->status == 'VERIFIED' ? 'green' : 'orange';
                 $text = Str::upper($row->status);
@@ -84,14 +163,19 @@ class ResepPasienController extends Controller
                             ";
             })
             ->rawColumns([
+                'nomor',
                 'action',
                 'status',
+                'status_bayar'
             ])
             ->make(true);
     }
 
     public function obat(Resep $resep)
     {
+
+        $resep->load(['penjualan', 'pasien', 'kunjungan', 'kunjungan.ruangan', 'dokter']);
+
         $data = DB::select("
             WITH obat_stok AS (
                 SELECT
@@ -110,6 +194,7 @@ class ResepPasienController extends Controller
                 rs.id as resep_id,
                 rs.status,
                 rs.nomor,
+                rs.asal_resep,
                 pr.name || ' ' || pr.dosis || ' ' || pr.satuan as obat,
                 pr.sediaan,
                 pr.satuan as satuan_dosis,
@@ -131,8 +216,22 @@ class ResepPasienController extends Controller
                 rd.waktu_pemberian_obat,
                 ap.name as aturan_pakai,
                 os.qty_tersedia,
-                os.harga_jual,
-                rd.qty * os.harga_jual as total,
+                (
+                    case
+                        when rs.status = 'ORDER' then
+                            os.harga_jual
+                        else
+                            pjd.harga_jual
+                    end
+                ) as harga_jual,
+                 (
+                    case
+                        when rs.status = 'ORDER' then
+                            rd.qty * os.harga_jual
+                        else
+                            rd.qty * pjd.harga_jual
+                    end
+                ) as total,
                 kpo.name as kondisi_pemberian
             from resep as rs
             inner join resep_detail as rd on rd.resep_id = rs.id
@@ -140,12 +239,20 @@ class ResepPasienController extends Controller
             inner join aturan_pakai_obat as ap on ap.id = rd.aturan_pakai_id
             LEFT JOIN obat_stok as os ON os.produk_id = rd.produk_id
             left join kondisi_pemberian_obat as kpo ON kpo.id = rd.kondisi_pemberian_obat_id
+            left join penjualan_detail as pjd on pjd.resep_id = rs.id
+                and pjd.resep_detail_id = rd.id
+                and pjd.produk_id = rd.produk_id
             where rs.id = ?
         ", [$resep->id, $resep->id]);
 
-        $details = collect($data)->map(function ($row) {
+        $totalTagihan = 0;
+        $details = collect($data)->map(function ($row) use (&$totalTagihan) {
             if (!empty($row->waktu_pemberian_obat)) {
                 $row->waktu_pemberian_obat = implode(", ", json_decode($row->waktu_pemberian_obat));
+            }
+
+            if ($row->jenis_resep == 'non_racikan') {
+                $totalTagihan += $row->embalase + $row->jasa_resep + $row->total;
             }
 
             return $row;
@@ -159,6 +266,7 @@ class ResepPasienController extends Controller
 
             // racikan
             $headerRacikan = $details->where('resep_id', $resep->id)->where('jenis_resep', 'racikan')->groupBy('receipt_number')->map->first();
+
 
             foreach ($headerRacikan as $header) {
                 $item = (object) [
@@ -181,6 +289,12 @@ class ResepPasienController extends Controller
                         ->where('jenis_resep', 'racikan')
                 ];
 
+                $totalTagihan += $details->where('receipt_number', $header->receipt_number)
+                    ->where('jenis_resep', 'racikan')
+                    ->sum('total');
+
+                $totalTagihan += $header->embalase + $header->jasa_resep;
+
 
                 $items->push($item);
             }
@@ -189,6 +303,8 @@ class ResepPasienController extends Controller
             $resep->items = [];
         }
 
+        $resep->total_tagihan = $totalTagihan;
+        $resep->total_tagihan_view = formatUang($totalTagihan);
         $resep->load(['dokter']);
 
         $view = view('farmasi.resep-pasien._resep_table', compact('resep'))->render();
@@ -356,5 +472,17 @@ class ResepPasienController extends Controller
             ]);
 
         return $this->sendResponse(message: __('http-response.success.update', ['Attribute' => 'Jasa Resep & Embalase']));
+    }
+
+    public function bayarTagihan(Resep $resep, Request $request)
+    {
+        $request->merge([
+            'status' => 'lunas'
+        ]);
+
+        Penjualan::where('resep_id', $resep->id)
+            ->update($request->only(['metode_pembayaran', 'total_tagihan', 'diskon', 'total_bayar', 'cash', 'kembalian', 'status']));
+
+        return $this->sendResponse(message: 'Tagihan Resep berhasil dibayar', data: $request->all());
     }
 }

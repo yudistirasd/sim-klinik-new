@@ -137,9 +137,13 @@
         </div>
         <div class="col-auto d-flex gap-2">
           @if ($resep->status == 'VERIFIED')
-            <button class="btn btn-outline-primary" onclick="event.stopPropagation()"><i class="ti ti-printer me-1"></i> E-Ticket</button>
+            <button type="button" class="btn btn-outline-primary" onclick="event.stopPropagation()"><i class="ti ti-printer me-1"></i> E-Ticket</button>
+            @if (empty($resep->penjualan) || $resep->penjualan->status == 'belum')
+              <button type="button" class="btn btn-outline-primary" onclick="handleBayarTagihan({{ json_encode($resep) }})"><i class="ti ti-printer me-1"></i> Bayar</button>
+            @else
+            @endif
           @else
-            <button class="btn btn-outline-dark" onclick="handleVerifikasiResep(event)"><i class="ti ti-credit-card me-1"></i> Verifikasi</button>
+            <button type="button" class="btn btn-outline-dark" onclick="handleVerifikasiResep(event)"><i class="ti ti-credit-card me-1"></i> Verifikasi</button>
           @endif
         </div>
       </div>
@@ -181,10 +185,17 @@
                 </td>
                 @if ($item->jenis_resep == 'non_racikan')
                   <td class="fw-medium">{{ $item->obat }}
-                    <button type="button" class="btn d-flex flex-row gap-1 mt-3" onclick="handleModalJasaResep({{ json_encode($item) }})" style="cursor: pointer">
-                      <small class="fs-5 text-muted fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
-                      <small class="fs-5 text-muted fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
-                    </button>
+                    @if (empty($resep->penjualan) || $resep->penjualan->status == 'belum')
+                      <button type="button" class="btn btn-light d-flex flex-row gap-1 mt-3" onclick="handleModalJasaResep({{ json_encode($item) }})" style="cursor: pointer">
+                        <small class="fs-5 text-black fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
+                        <small class="fs-5 text-black fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
+                      </button>
+                    @else
+                      <button type="button" class="btn btn-light d-flex flex-row gap-1 mt-3">
+                        <small class="fs-5 text-black fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
+                        <small class="fs-5 text-black fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
+                      </button>
+                    @endif
                   </td>
                 @else
                   <td>
@@ -205,10 +216,17 @@
                       @endforeach
                     </ul>
                     <small class="text-purple text-uppercase" style="color:#7c3aed"><i class="bi bi-box me-1"></i>{{ $item->jumlah_racikan }} {{ $item->kemasan_racikan }}</small>
-                    <button type="button" class="btn d-flex flex-row gap-1 mt-3" onclick="handleModalJasaResep({{ json_encode($item) }})" style="cursor: pointer">
-                      <small class="fs-5 text-muted fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
-                      <small class="fs-5 text-muted fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
-                    </button>
+                    @if (empty($resep->penjualan) || $resep->penjualan->status == 'belum')
+                      <button type="button" class="btn btn-light d-flex flex-row gap-1 mt-3" onclick="handleModalJasaResep({{ json_encode($item) }})" style="cursor: pointer">
+                        <small class="fs-5 text-black fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
+                        <small class="fs-5 text-black fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
+                      </button>
+                    @else
+                      <button type="button" class="btn btn-light d-flex flex-row gap-1 mt-3" style="cursor: pointer">
+                        <small class="fs-5 text-black fst-italic">Embalase : {{ formatUang($item->embalase) }}</small>
+                        <small class="fs-5 text-black fst-italic">Jasa Resep : {{ formatUang($item->jasa_resep) }}</small>
+                      </button>
+                    @endif
                   </td>
                 @endif
                 <td class="text-center">{{ $item->signa }}</td>

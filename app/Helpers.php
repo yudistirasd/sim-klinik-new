@@ -137,3 +137,46 @@ if (! function_exists('waktuPemberianObat')) {
         ]);
     }
 }
+
+// untuk hitung usia pasien jika query dari non eloquent model
+if (!function_exists('hitungUsiaPasien')) {
+    function hitungUsiaPasien($tanggal_lahir, $tanggalKunjungan = null)
+    {
+        if (!$tanggal_lahir) {
+            return '-';
+        }
+
+        $tglLahir = \Carbon\Carbon::parse($tanggal_lahir);
+        $tglAcuan = $tanggalKunjungan
+            ? \Carbon\Carbon::parse($tanggalKunjungan)
+            : \Carbon\Carbon::now();
+
+        $diff = $tglLahir->diff($tglAcuan);
+
+        // --- LOGIKA BARU ---
+        // 1. ≥ 1 tahun → tampil TAHUN saja
+        if ($diff->y >= 1) {
+            return "{$diff->y} Th";
+        }
+
+        // 2. < 1 tahun, tetapi ≥ 1 bulan → tampil BULAN saja
+        if ($diff->m >= 1) {
+            return "{$diff->m} Bln";
+        }
+
+        // 3. < 1 bulan → tampil HARI saja
+        return "{$diff->d} Hr";
+    }
+}
+
+
+if (! function_exists('metodePembayaran')) {
+    function metodePembayaran(): Collection
+    {
+        return collect([
+            'Tunai',
+            'Transfer',
+            'Qris',
+        ]);
+    }
+}

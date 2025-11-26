@@ -377,6 +377,127 @@
         </div>
       </div>
     </div>
+
+    <div class="modal modal-blur fade" id="modal-bayar" tabindex="-1" role="dialog" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Bayar Tagihan</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form @submit.prevent="handleSubmitBayarTagihan" autocomplete="off">
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-md-4 col-sm-12" x-show="formBayarTagihan.asal_resep == 'IN'">
+                  <div class="mb-3">
+                    <label class="form-label">Tgl Registrasi</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.tanggal">
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-12" x-show="formBayarTagihan.asal_resep == 'IN'">
+                  <div class="mb-3">
+                    <label class="form-label">No Registrasi</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.noregistrasi">
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-12" x-show="formBayarTagihan.asal_resep == 'IN'">
+                  <div class="mb-3">
+                    <label class="form-label">Ruangan</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.ruang">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">No RM</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.norm">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Nama Pasien</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.nama">
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Alamat Pasien</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.alamat">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Usia</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.usia">
+                  </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                  <div class="mb-3">
+                    <label class="form-label">Dokter</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="formBayarTagihan.dokter">
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    <label class="form-label">Total Tagihan</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="total_tagihan_view">
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="mb-3">
+                    <label class="form-label">Diskon</label>
+                    <input type="text" class="form-control" autocomplete="off" id="diskon">
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="mb-3">
+                    <label class="form-label">Total Bayar</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="total_bayar_view">
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="mb-3">
+                    <label class="form-label">Metode Pembayaran</label>
+                    <div class="row row-cols-2">
+                      @foreach (metodePembayaran() as $item)
+                        <div class="col">
+                          <label class="form-check fs-5">
+                            <input class="form-check-input" x-model="formBayarTagihan.metode_pembayaran" :class="{ 'is-invalid': errors.metode_pembayaran }" type="radio" value="{{ $item }}">
+                            <span class="form-check-label fw-bolder">{{ $item }}</span>
+                          </label>
+                        </div>
+                      @endforeach
+                      <div class="invalid-feedback d-block" x-text="errors.metode_pembayaran"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col" x-show="formBayarTagihan.metode_pembayaran == 'Tunai'">
+                  <div class="mb-3">
+                    <label class="form-label">Uang Tunai</label>
+                    <input type="text" class="form-control" id="cash" autocomplete="off">
+                  </div>
+                </div>
+                <div class="col" x-show="formBayarTagihan.metode_pembayaran == 'Tunai'">
+                  <div class="mb-3">
+                    <label class="form-label">Kembalian</label>
+                    <input type="text" disabled class="form-control" autocomplete="off" x-model="kembalian_view">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-link link-secondary" data-bs-dismiss="modal">Batal</button>
+              <button type="submit" class="btn btn-primary ms-auto" x-bind:disabled="loading">
+                <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
+                Bayar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 @endsection
 @push('js')
@@ -434,10 +555,35 @@
           jasa_resep: 0,
           embalase: 0,
         },
+        formBayarTagihan: {
+          kunjungan_id: null,
+          noregistrasi: null,
+          tanggal: null,
+          nama: null,
+          norm: null,
+          alamat: null,
+          usia: null,
+          ruang: null,
+          dokter: null,
+          resep_id: null,
+          asal_resep: null,
+          total_tagihan: null,
+          diskon: null,
+          total_bayar: null,
+          metode_pembayaran: 'Tunai',
+          cash: null,
+          kembalian: null
+        },
         sediaan: '',
         satuan: '',
         dosis: '',
         endPoint: '',
+        endPointBayarTagihan: null,
+        total_tagihan_view: null,
+        mask_diskon_view: {},
+        mask_uang_tunai_view: {},
+        total_bayar_view: null,
+        kembalian_view: null,
         errors: {},
         loading: false,
 
@@ -1010,7 +1156,7 @@
         },
 
 
-        modalControl(data) {
+        modalControlJasaResep(data) {
           this.endPoint = route('api.farmasi.resep-pasien.jasa-resep', {
             resep: data.resep_id,
             receipt_number: data.receipt_number
@@ -1070,6 +1216,150 @@
             }
           })
         },
+
+        modalControlBayarTagihan(row) {
+          console.log(row);
+          this.resetFormBayarTagihan();
+
+          this.formBayarTagihan.asal_resep = row.asal_resep;
+
+          if (row.asal_resep == 'IN') {
+            this.formBayarTagihan.kunjungan_id = row.kunjungan.id;
+            this.formBayarTagihan.noregistrasi = row.kunjungan.noregistrasi;
+            this.formBayarTagihan.ruang = row.kunjungan.ruangan.name;
+          }
+          this.formBayarTagihan.tanggal = row.tanggal;
+          this.formBayarTagihan.nama = row.pasien.nama;
+          this.formBayarTagihan.norm = row.pasien.norm;
+          this.formBayarTagihan.alamat = row.pasien.alamat;
+          this.formBayarTagihan.usia = row.pasien.usia;
+          this.formBayarTagihan.dokter = row.dokter.name;
+          this.formBayarTagihan.resep_id = row.resep_id;
+          this.formBayarTagihan.total_tagihan = row.total_tagihan;
+          this.formBayarTagihan.total_bayar = row.total_tagihan;
+          this.total_bayar_view = formatUang(row.total_tagihan);
+
+          this.mask_diskon_view = IMask(document.getElementById('diskon'), {
+            mask: Number,
+            scale: 0,
+            thousandsSeparator: ',',
+          }).on('accept', () => {
+            this.hitungTotalBayar();
+          });
+
+
+          this.mask_uang_tunai_view = IMask(document.getElementById('cash'), {
+            mask: Number,
+            thousandsSeparator: ',',
+          }).on('accept', () => {
+            this.hitungKembalian();
+          });
+
+          // view rupiah
+          this.total_tagihan_view = row.total_tagihan_view;
+
+          this.endPointBayarTagihan = route('api.farmasi.resep-pasien.bayar-tagihan', {
+            resep: row.id
+          });
+
+          $('#modal-bayar').modal('show');
+        },
+
+        resetFormBayarTagihan() {
+          this.formBayarTagihan = {
+            kunjungan_id: null,
+            noregistrasi: null,
+            tanggal: null,
+            nama: null,
+            norm: null,
+            alamat: null,
+            usia: null,
+            ruang: null,
+            dokter: null,
+            resep_id: null,
+            asal_resep: null,
+            total_tagihan: null,
+            diskon: null,
+            total_bayar: null,
+            metode_pembayaran: 'Tunai',
+            cash: null,
+            kembalian: null
+          };
+
+          this.total_bayar_view = '';
+          this.total_tagihan_view = '';
+          this.kembalian_view = '';
+          this.mask_diskon_view.value = '';
+          this.mask_uang_tunai_view.value = '';
+        },
+
+        hitungTotalBayar() {
+          let diskon = Number(this.mask_diskon_view.unmaskedValue || 0)
+          let totalBayar = Number(this.formBayarTagihan.total_tagihan - diskon || 0);
+
+          this.formBayarTagihan.diskon = diskon;
+          this.formBayarTagihan.total_bayar = totalBayar;
+          this.total_bayar_view = formatUang(totalBayar);
+        },
+
+        hitungKembalian() {
+          let cash = Number(this.mask_uang_tunai_view.unmaskedValue || 0);
+          let kembalian = cash - this.formBayarTagihan.total_bayar;
+
+          if (kembalian < 0) {
+            kembalian = 0;
+          }
+
+          this.formBayarTagihan.cash = cash;
+          this.formBayarTagihan.kembalian = kembalian;
+          this.kembalian_view = formatUang(kembalian);
+        },
+
+        handleSubmitBayarTagihan() {
+          this.loading = true;
+          this.errors = {};
+
+
+          $.ajax({
+            url: this.endPointBayarTagihan,
+            method: 'POST',
+            dataType: 'json',
+            data: this.formBayarTagihan,
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            complete: () => {
+              this.loading = false;
+            }
+          }).done((response) => {
+            Toast.fire({
+              icon: 'success',
+              title: response.message
+            });
+
+            this.resetFormBayarTagihan();
+
+            $('#modal-bayar').modal('hide');
+
+            resepObat();
+
+          }).fail((error) => {
+            if (error.status === 422) {
+              this.errors = error.responseJSON.errors;
+
+              Toast.fire({
+                icon: 'error',
+                title: error.responseJSON.message
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Terjadi Kesalahan !',
+                text: error.responseJSON.message
+              });
+            }
+          })
+        }
       }))
     })
 
@@ -1125,7 +1415,12 @@
     const handleModalJasaResep = (data) => {
       console.log(data.detail_resep_id);
       const alpineComponent = Alpine.$data(document.querySelector('[x-data="Resep"]'));
-      alpineComponent.modalControl(data);
+      alpineComponent.modalControlJasaResep(data);
+    }
+
+    const handleBayarTagihan = (data) => {
+      const alpineComponent = Alpine.$data(document.querySelector('[x-data="Resep"]'));
+      alpineComponent.modalControlBayarTagihan(data);
     }
   </script>
 @endpush
