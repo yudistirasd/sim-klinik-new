@@ -23,7 +23,7 @@ class UpdatePasienRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nik' => ['bail', 'required', Rule::unique('pasien', 'nik')->ignore($this->pasien->id)],
+            'nik' => ['bail', 'required'],
             'nama' => 'required',
             'tempat_lahir' => 'required',
             'tanggal_lahir' => 'required',

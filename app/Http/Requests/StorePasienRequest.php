@@ -22,7 +22,7 @@ class StorePasienRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nik' => 'bail|required|unique:pasien,nik',
+            'nik' => 'bail|required',
             'nama' => 'required',
             'tempat_lahir' => 'required',
             'tanggal_lahir' => 'required',
