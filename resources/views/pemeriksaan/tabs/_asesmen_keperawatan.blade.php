@@ -307,7 +307,7 @@
         endPoint: '',
         errors: {},
         loading: false,
-        isUserPerawat: currentUser.role == 'perawat',
+        isUserPerawat: ['perawat', 'loket'].includes(currentUser.role),
 
         handleSubmit() {
           this.loading = true;

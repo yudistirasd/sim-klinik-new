@@ -1,6 +1,6 @@
 <div x-data="CPPT" x-init="init()">
 
-  @if (in_array(Auth::user()->role, ['dokter', 'perawat']))
+  @if (in_array(Auth::user()->role, ['dokter', 'perawat', 'loket']))
     <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
       <div class="mb-3 row">
         <label class="col-3 col-form-label">Petugas Pelaksana</label>

@@ -1,6 +1,6 @@
 <div x-data="Tindakan" x-init="init()">
 
-  @if (in_array(Auth::user()->role, ['admin', 'dokter']))
+  @if (in_array(Auth::user()->role, ['admin', 'dokter', 'loket', 'perawat']))
     <form @submit.prevent="handleSubmit" autocomplete="off" id="cppt">
       <div class="mb-3 row">
         <label class="col-2 col-form-label">Tindakan</label>
